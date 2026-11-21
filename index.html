@@ -1211,24 +1211,52 @@
 #hm-root .stat span{display:block;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
 #hm-root .stat b{font-family:var(--f-mono);font-size:15px}
 /* ---------------- mines ---------------- */#hm-root .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;max-width:326px;margin:0 auto;width:100%}
-#hm-root .cell{aspect-ratio:1;border-radius:var(--r-s);background:linear-gradient(var(--ink-4),var(--ink-3));box-shadow:0 3px 0 #0B1226;display:grid;place-items:center;color:var(--muted);transition:transform .08s,box-shadow .08s}
-#hm-root .cell:not(:disabled):hover{background:linear-gradient(var(--ink-5),var(--ink-4))}
-#hm-root .cell:not(:disabled):active{transform:translateY(3px);box-shadow:0 0 0}
-#hm-root .cell.gem{background:rgba(79,227,161,.14);box-shadow:inset 0 0 0 1px rgba(79,227,161,.4);color:var(--mint);animation:pop .22s ease}
-#hm-root .cell.mine{background:rgba(255,77,109,.16);box-shadow:inset 0 0 0 1px rgba(255,77,109,.45);color:var(--hot)}
-#hm-root .cell.dim{opacity:.32;box-shadow:none}
+/* the tiles: raised slabs that lift under a finger; a safe pick flips over onto a
+   lit emerald, a bomb goes off in red and shakes the board */
+#hm-root .cell,#hm-root .ttile{position:relative;border-radius:9px;color:var(--muted);display:grid;place-items:center;
+  background:linear-gradient(160deg,#3A4C82 0%,#2A3864 48%,#1E2A4D 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 #0B1226,0 6px 12px rgba(0,0,0,.28);
+  transition:transform .12s,box-shadow .12s,filter .12s}
+#hm-root .cell::after,#hm-root .ttile::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(125deg,rgba(255,255,255,.10) 0 28%,transparent 28% 100%)}
+#hm-root .cell{aspect-ratio:1}
+#hm-root .cell:not(:disabled):hover,#hm-root .trow.live .ttile:not(:disabled):hover{transform:translateY(-2px);filter:brightness(1.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 0 0 1.5px rgba(242,181,68,.7),0 5px 0 #0B1226,0 10px 18px rgba(0,0,0,.35)}
+#hm-root .cell:not(:disabled):active,#hm-root .ttile:not(:disabled):active{transform:translateY(2px);box-shadow:0 1px 0 #0B1226}
+#hm-root .cell.gem,#hm-root .ttile.safe{color:var(--mint);
+  background:radial-gradient(circle at 50% 42%,rgba(79,227,161,.45),rgba(79,227,161,.10) 62%),#102035;
+  box-shadow:inset 0 0 0 1.5px rgba(79,227,161,.6),0 0 16px rgba(79,227,161,.35),0 3px 0 #07311F;animation:tileflip .42s cubic-bezier(.2,1.5,.4,1)}
+#hm-root .cell.mine,#hm-root .ttile.bomb{color:var(--hot);
+  background:radial-gradient(circle at 50% 45%,rgba(255,77,109,.5),rgba(255,77,109,.12) 65%),#22101A;
+  box-shadow:inset 0 0 0 1.5px rgba(255,77,109,.65),0 3px 0 #3A0B17;animation:tileboom .55s ease-out}
+#hm-root .cell.dim,#hm-root .ttile.dim{opacity:.38;filter:saturate(.55);box-shadow:inset 0 0 0 1px rgba(255,77,109,.3);animation:tilefade .35s ease}
+#hm-root .cell.gem::after,#hm-root .ttile.safe::after,#hm-root .cell.mine::after,#hm-root .ttile.bomb::after{display:none}
+#hm-root .cell svg.jewel{width:64%;height:64%;animation:jewelpop .45s cubic-bezier(.2,1.6,.4,1) both}
+#hm-root .ttile svg.jewel{width:auto;height:78%;animation:jewelpop .45s cubic-bezier(.2,1.6,.4,1) both}
+#hm-root .spark{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;
+  background:var(--c);box-shadow:0 0 6px var(--c);pointer-events:none;z-index:2;animation:spark .65s ease-out forwards}
+#hm-root .shake{animation:boardshake .42s ease}
+@keyframes tileflip{0%{transform:perspective(300px) rotateY(90deg) scale(.92)}100%{transform:none}}
+@keyframes tilefade{from{opacity:0;transform:scale(.85)}}
+@keyframes jewelpop{0%{transform:scale(.2) rotate(-25deg);opacity:0}70%{transform:scale(1.15) rotate(4deg);opacity:1}100%{transform:none}}
+@keyframes tileboom{0%{transform:scale(1.18);filter:brightness(2.2)}100%{transform:none;filter:none}}
+@keyframes spark{to{transform:translate(var(--dx),var(--dy)) scale(.15);opacity:0}}
+@keyframes boardshake{0%,100%{transform:none}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(2px,-1px)}}
 @keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.09)}100%{transform:none}}
 /* ---------------- towers ---------------- */#hm-root .tower{display:flex;flex-direction:column-reverse;gap:5px;max-width:340px;margin:0 auto;width:100%}
 #hm-root .trow{display:flex;gap:5px;align-items:center}
 #hm-root .trow .lv{width:44px;flex:none;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);text-align:right;padding-right:4px}
 #hm-root .trow .tiles{display:flex;gap:5px;flex:1}
-#hm-root .ttile{flex:1;height:34px;border-radius:var(--r-s);background:linear-gradient(var(--ink-4),var(--ink-3));box-shadow:0 3px 0 #0B1226;display:grid;place-items:center;color:var(--muted);transition:transform .08s}
-#hm-root .trow.live .ttile:not(:disabled):hover{background:linear-gradient(var(--ink-5),var(--ink-4))}
-#hm-root .trow.live .lv{color:var(--brass)}
-#hm-root .trow.done{opacity:.85}
-#hm-root .ttile.safe{background:rgba(79,227,161,.16);box-shadow:inset 0 0 0 1px rgba(79,227,161,.4);color:var(--mint)}
-#hm-root .ttile.bomb{background:rgba(255,77,109,.18);box-shadow:inset 0 0 0 1px rgba(255,77,109,.45);color:var(--hot)}
-#hm-root .ttile.dim{opacity:.3;box-shadow:none}
+#hm-root .ttile{flex:1;height:34px}
+/* the row you are on: its tiles breathe gold and its multiplier is pointed at */
+#hm-root .trow.live .ttile:not(:disabled){animation:livepulse 1.5s ease-in-out infinite}
+#hm-root .trow.live .lv{color:var(--brass);font-weight:700}
+#hm-root .trow.live .lv::before{content:'\25B6';font-size:8px;margin-right:3px;vertical-align:1px}
+#hm-root .trow.done{opacity:.92}
+#hm-root .tower{padding:8px;border-radius:12px;background:linear-gradient(rgba(0,0,0,.28),rgba(0,0,0,.12));
+  border:1px solid var(--ink-3);box-shadow:inset 0 0 24px rgba(0,0,0,.35)}
+@keyframes livepulse{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 3px 0 #0B1226}
+  50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 0 0 1.5px rgba(242,181,68,.6),0 3px 0 #0B1226,0 0 14px rgba(242,181,68,.25)}}
 /* ---------------- slots ---------------- */#hm-root .slotbox{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 #hm-root .reels{display:flex;gap:8px;padding:14px;border-radius:var(--r);background:linear-gradient(#060A16,#0D1426);border:1px solid var(--ink-4);box-shadow:inset 0 3px 16px rgba(0,0,0,.8)}
 #hm-root .reel{width:clamp(58px,17vw,84px);height:clamp(72px,21vw,102px);border-radius:var(--r-s);background:linear-gradient(180deg,#1B2544,#0E1529 40%,#0E1529 60%,#1B2544);overflow:hidden;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
@@ -1281,14 +1309,29 @@
 #hm-root .lane.past{background:linear-gradient(#12233A,#0E1B2E)}
 #hm-root .lane b{font-family:var(--f-mono);font-size:11px;font-weight:700;color:var(--muted);position:relative;z-index:2;background:rgba(0,0,0,.5);padding:1px 6px;border-radius:999px}
 #hm-root .lane.next b,#hm-root .lane.past b{color:var(--brass)}
-#hm-root .hero{position:absolute;left:50%;top:40px;transform:translateX(-50%);z-index:3;color:var(--brass)}
-#hm-root .hero.hop{animation:hop .22s ease}
-@keyframes hop{0%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-15px) scale(1.12)}100%{transform:translateX(-50%) translateY(0)}}
-#hm-root .hero.splat{animation:splat .4s ease forwards}
-@keyframes splat{to{transform:translateX(-50%) scale(1.5);opacity:.25;filter:grayscale(1)}}
-#hm-root .car{position:absolute;left:50%;transform:translateX(-50%);z-index:2;color:var(--hot)}
-#hm-root .car.zoom{animation:zoom .45s linear}
-@keyframes zoom{from{top:-32px}to{top:130px}}
+/* the runner: an animal you pick, that leaps lane to lane */
+#hm-root .hero{position:absolute;left:50%;top:34px;transform:translateX(-50%);z-index:3;transform-origin:50% 100%;
+  filter:drop-shadow(0 3px 2px rgba(0,0,0,.55))}
+#hm-root .hero svg{display:block;width:34px;height:34px}
+#hm-root .hero::after{content:'';position:absolute;left:18%;right:18%;bottom:-3px;height:5px;border-radius:50%;background:rgba(0,0,0,.45);z-index:-1}
+#hm-root .hero.splat{animation:splat .32s ease-out forwards}
+@keyframes splat{0%{transform:translateX(-50%) scale(1.3,.7)}100%{transform:translateX(-50%) scale(1.55,.32);opacity:.7;filter:grayscale(.8) drop-shadow(0 0 0 transparent)}}
+#hm-root .hero.cheer{animation:cheer .9s ease}
+@keyframes cheer{0%,100%{transform:translateX(-50%)}20%{transform:translateX(-50%) translateY(-16px) rotate(-8deg)}40%{transform:translateX(-50%) scale(1.1,.9)}60%{transform:translateX(-50%) translateY(-11px) rotate(8deg)}80%{transform:translateX(-50%) scale(1.06,.94)}}
+#hm-root .lane .dust{position:absolute;left:50%;top:62px;width:34px;height:10px;margin-left:-17px;border-radius:50%;
+  background:radial-gradient(rgba(200,190,170,.55),transparent 70%);pointer-events:none;animation:dust .45s ease-out forwards}
+@keyframes dust{from{transform:scale(.4);opacity:1}to{transform:scale(1.6,1.2);opacity:0}}
+/* the car that comes down the lane */
+#hm-root .car{position:absolute;left:50%;transform:translateX(-50%);z-index:4;filter:drop-shadow(0 4px 4px rgba(0,0,0,.6))}
+#hm-root .car svg{display:block;width:30px;height:42px}
+#hm-root .car.zoom{animation:zoom .5s cubic-bezier(.5,0,.8,.6) forwards}
+@keyframes zoom{from{top:-46px}to{top:150px}}
+/* the runner picker */
+#hm-root .petpick{display:flex;gap:4px;width:100%}
+#hm-root .petpick button{flex:1;display:grid;place-items:center;padding:4px 0;border-radius:var(--r-s);background:var(--ink-3);border:1px solid var(--ink-4)}
+#hm-root .petpick button svg{width:26px;height:26px}
+#hm-root .petpick button[aria-pressed="true"]{background:rgba(242,181,68,.16);border-color:var(--brass);box-shadow:0 0 0 1px var(--brass)}
+#hm-root .petpick button:disabled{opacity:.45}
 /* ---------------- balloon ---------------- */#hm-root .balloonbox{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;position:relative;padding-top:44px}
 #hm-root .balloon{
   width:120px;height:146px;border-radius:50% 50% 50% 50% / 56% 56% 44% 44%;position:relative;
@@ -1593,9 +1636,17 @@
 #hm-root .caserail{position:relative;height:104px;border-radius:var(--r);overflow:hidden;background:linear-gradient(#060A16,#131B33);border:1px solid var(--ink-4);box-shadow:inset 0 3px 16px rgba(0,0,0,.75)}
 #hm-root .caserail::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--brass);box-shadow:0 0 12px var(--brass);z-index:3}
 #hm-root .casestrip{position:absolute;top:0;bottom:0;left:0;display:flex;align-items:center;gap:6px;padding:0 6px}
-#hm-root .citem{flex:none;width:86px;height:88px;border-radius:var(--r-s);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:var(--ink-2);border:1px solid var(--ink-3);border-bottom:3px solid var(--tier,var(--muted))}
-#hm-root .citem b{font-family:var(--f-mono);font-size:13px;font-weight:700;color:var(--tier,var(--paper))}
-#hm-root .citem span{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+#hm-root .citem{flex:none;width:86px;height:88px;border-radius:var(--r-s);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:var(--ink-2);border:1px solid var(--ink-3);border-bottom:3px solid var(--tier,var(--muted))}
+#hm-root .citem .cart{width:44px;height:42px;display:grid;place-items:center;border-radius:50%;
+  background:radial-gradient(circle,var(--glow,transparent) 0%,transparent 68%)}
+#hm-root .citem .cart svg{filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+#hm-root .citem b{font-family:var(--f-mono);font-size:12px;font-weight:700;color:var(--tier,var(--paper));line-height:1.1}
+#hm-root .citem span{font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+#hm-root .citem.won{animation:casewon .9s ease 3;box-shadow:0 0 0 2px var(--tier),0 0 22px var(--glow)}
+@keyframes casewon{50%{transform:scale(1.07)}}
+#hm-root .co{display:grid;grid-template-columns:18px minmax(0,1fr);column-gap:6px;align-items:center}
+#hm-root .co .coart{grid-row:1/3;display:grid}
+#hm-root #hm-caseOut svg{vertical-align:-4px}
 #hm-root .caseodds{display:grid;grid-template-columns:repeat(auto-fit,minmax(74px,1fr));gap:5px}
 #hm-root .co{background:rgba(0,0,0,.24);border:1px solid var(--ink-3);border-left:3px solid var(--tier,var(--muted));border-radius:4px;padding:5px 7px;font-family:var(--f-mono);font-size:10px}
 #hm-root .co b{display:block;color:var(--tier,var(--paper));font-size:11.5px}
@@ -2030,7 +2081,7 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
         <button class="btn" id="casinobtn">HOUSE MONEY</button>
       </div>
       <button class="btn" id="go">START</button>
-      <span id="mbuild">build washout-38</span>
+      <span id="mbuild">build washout-39</span>
     </div>
   </div>
 
@@ -2323,6 +2374,7 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
           <div class="act" data-a="cross">
             <div class="field"><label for="hm-xDiff">Risk</label>
               <select id="hm-xDiff"><option value="low">Low</option><option value="med" selected>Medium</option><option value="high">High</option><option value="extreme">Extreme</option><option value="nightmare">Nightmare</option></select></div>
+            <div class="field"><label>Runner</label><div class="petpick" id="hm-petPick"></div></div>
             <button class="go" id="hm-xGo">Place bet</button>
             <button class="go sm cash hide" id="hm-xCashBtn">Cash out</button>
           </div>
@@ -2760,7 +2812,7 @@ function save(){
       jack:S.jack, jackHits:S.jackHits, hist:S.hist.slice(-300),
       tankWon:!!S.tankWon, allIns:S.allIns||0, bigBusts:S.bigBusts||0,
       ach:S.ach, title:S.title, streak:S.streak, bestStreak:S.bestStreak, loseStreak:S.loseStreak,
-      sound:S.sound, favs:S.favs, recent:S.recent, stats:S.stats }));
+      sound:S.sound, favs:S.favs, recent:S.recent, stats:S.stats, pet:S.pet }));
   }catch(e){} }, 500);
 }
 async function load(){
@@ -3369,8 +3421,22 @@ function drawRocket(x,y,ang,burn,scale){
   cx.strokeStyle='rgba(10,15,31,.5)'; cx.lineWidth=.8; cx.beginPath(); cx.arc(3,0,1.9,0,7); cx.stroke();
   cx.restore();
 }
+/* The plot sits inside a margin, so the rocket is whole at the start of the
+   line: it used to begin in the very corner, half off the canvas, and on a
+   phone you could not see where it took off from. */
+const CRASH_PAD={l:26,r:10,t:10,b:22};
+const crashX=(w,maxT)=>t=>CRASH_PAD.l+(w-CRASH_PAD.l-CRASH_PAD.r)*(t/maxT);
+const crashY=(h,maxM)=>m=>h-CRASH_PAD.b-(h-CRASH_PAD.t-CRASH_PAD.b)*((m-1)/(maxM-1));
+/* the launch pad: a lit strip under the start of the line */
+function drawPad(x,y,lit){
+  const g=cx.createRadialGradient(x,y+2,1,x,y+2,22);
+  g.addColorStop(0,hexA(lit?THEME.brass:THEME.mint,lit?.55:.28)); g.addColorStop(1,hexA(THEME.mint,0));
+  cx.fillStyle=g; cx.beginPath(); cx.ellipse(x,y+3,22,7,0,0,7); cx.fill();
+  cx.fillStyle=hexA(THEME.paper,.5); cx.fillRect(x-13,y+4,26,2.5);
+  cx.fillStyle=hexA(THEME.paper,.25); cx.fillRect(x-9,y+6.5,2,4); cx.fillRect(x+7,y+6.5,2,4);
+}
 function drawCrash(){
-  const dpr=window.devicePixelRatio||1, w=cCv.width/dpr, h=cCv.height/dpr, pad=8;
+  const dpr=window.devicePixelRatio||1, w=cCv.width/dpr, h=cCv.height/dpr, P=CRASH_PAD;
   const now=performance.now(), dt=Math.min(.05,(now-(cLastT||now))/1000); cLastT=now;
   cx.clearRect(0,0,w,h);
   const el = cState==='run' ? now-cStart
@@ -3389,22 +3455,26 @@ function drawCrash(){
   cx.strokeStyle=hexA(THEME.paper,.09); cx.lineWidth=1;
   cx.font='600 10px JetBrains Mono, monospace'; cx.textBaseline='bottom';
   for(let i=1;i<4;i++){
-    const y=pad+(h-pad*2)*i/4; cx.beginPath(); cx.moveTo(pad,y); cx.lineTo(w-pad,y); cx.stroke();
+    const y=P.t+(h-P.t-P.b)*i/4; cx.beginPath(); cx.moveTo(P.l,y); cx.lineTo(w-P.r,y); cx.stroke();
     cx.fillStyle=hexA(THEME.paper,.3); cx.textAlign='right';
-    cx.fillText(fmtX(1+(maxM-1)*(1-i/4))+'×', w-pad-2, y-2);
+    cx.fillText(fmtX(1+(maxM-1)*(1-i/4))+'×', w-P.r-2, y-2);
   }
   cx.textAlign='center'; cx.textBaseline='bottom';
-  const stepS=maxT>20000?10:maxT>9000?4:2;
-  for(let s=stepS;s*1000<maxT;s+=stepS){ const x=pad+(w-pad*2)*(s*1000/maxT); cx.fillStyle=hexA(THEME.paper,.22); cx.fillText(s+'s',x,h-pad); }
+  const stepS=maxT>20000?10:maxT>9000?4:2, X0=crashX(w,maxT);
+  for(let s=stepS;s*1000<maxT;s+=stepS){ cx.fillStyle=hexA(THEME.paper,.22); cx.fillText(s+'s',X0(s*1000),h-3); }
+  /* where it takes off from, always on show */
+  drawPad(P.l,h-P.b,cState==='run');
+  /* waiting for a bet: the rocket sits on the pad, nose up and to the right */
+  if(el<=0) drawRocket(P.l+4,h-P.b-6,-Math.PI/4,false,1.15);
   if(el>0){
-    const X=t=>pad+(w-pad*2)*(t/maxT), Y=m=>h-pad-(h-pad*2)*((m-1)/(maxM-1));
+    const X=crashX(w,maxT), Y=crashY(h,maxM);
     const bust=cState==='bust', cashed=cState!=='run'&&!bust;
     const col = bust?THEME.hot:cashed?THEME.brass:THEME.mint, N=90;
     const tipM=Math.exp(K*el);
     cx.beginPath(); cx.moveTo(X(0),Y(1));
     for(let i=1;i<=N;i++){ const t=el*i/N; cx.lineTo(X(t),Y(Math.exp(K*t))); }
-    cx.lineTo(X(el),h-pad); cx.lineTo(X(0),h-pad); cx.closePath();
-    const g=cx.createLinearGradient(0,pad,0,h);
+    cx.lineTo(X(el),h-P.b); cx.lineTo(X(0),h-P.b); cx.closePath();
+    const g=cx.createLinearGradient(0,P.t,0,h);
     g.addColorStop(0, hexA(col,.32)); g.addColorStop(1,'rgba(0,0,0,0)'); cx.fillStyle=g; cx.fill();
     cx.beginPath(); cx.moveTo(X(0),Y(1));
     for(let i=1;i<=N;i++){ const t=el*i/N; cx.lineTo(X(t),Y(Math.exp(K*t))); }
@@ -3423,7 +3493,7 @@ function drawCrash(){
     } else if(cashed){
       /* where you got out: a flag on the line, and the rocket coasting */
       cx.strokeStyle=hexA(THEME.brass,.8); cx.lineWidth=1.5; cx.setLineDash([3,3]);
-      cx.beginPath(); cx.moveTo(tx,ty); cx.lineTo(tx,h-pad); cx.stroke(); cx.setLineDash([]);
+      cx.beginPath(); cx.moveTo(tx,ty); cx.lineTo(tx,h-P.b); cx.stroke(); cx.setLineDash([]);
       cx.fillStyle=THEME.brass; cx.beginPath(); cx.arc(tx,ty,5,0,7); cx.fill();
       drawRocket(tx,ty,ang,false,1.15);
     }
@@ -3454,9 +3524,9 @@ function drawCrash(){
 }
 /* the explosion when it snaps, played out on its own loop since the round is over */
 function crashBoom(){
-  const dpr=window.devicePixelRatio||1, w=cCv.width/dpr, h=cCv.height/dpr, pad=8;
+  const dpr=window.devicePixelRatio||1, w=cCv.width/dpr, h=cCv.height/dpr;
   const el=Math.log(Math.max(1,cMult))/K, maxT=Math.max(5000, el*1.12), maxM=Math.max(2, cMult*1.25);
-  const x=pad+(w-pad*2)*(el/maxT), y=h-pad-(h-pad*2)*((cMult-1)/(maxM-1));
+  const x=crashX(w,maxT)(el), y=crashY(h,maxM)(cMult);
   if(!reduced){
     cFx.push({flash:1,x,y,r:46,t:0,life:.28});
     for(let q=0;q<56;q++){
@@ -3548,6 +3618,47 @@ function crashFire(){
 $('crashGo').onclick = () => { cState==='run' ? cashCrash() : crashFire(); };
 HOOK.crash={fire:crashFire};
 
+/* ---- the jewels under the tiles, shared by Mines and Towers ----
+   Filled art rather than line icons: a cut emerald and a lit bomb. The
+   gradients are defined inside each one, so any copy can be removed. */
+function gemArt(){
+  return '<svg class="jewel" viewBox="0 0 24 24" aria-hidden="true"><defs>'+
+    '<linearGradient id="hmGemA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B9FFE0"/><stop offset=".45" stop-color="#4FE3A1"/><stop offset="1" stop-color="#0E8A5B"/></linearGradient>'+
+    '<linearGradient id="hmGemB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E9FFF5"/><stop offset="1" stop-color="#5EE7E7"/></linearGradient></defs>'+
+    '<path d="M6.3 3.2h11.4L22 9.2 12 21.6 2 9.2z" fill="url(#hmGemA)" stroke="#0A5C3D" stroke-width=".7" stroke-linejoin="round"/>'+
+    '<path d="M2 9.2h20M8.6 3.2 6.4 9.2 12 21.6M15.4 3.2l2.2 6L12 21.6M6.4 9.2 12 3.2l5.6 6" fill="none" stroke="#0A5C3D" stroke-width=".55" opacity=".55"/>'+
+    '<path d="M6.3 3.2h4.6L8.6 9.2H2z" fill="url(#hmGemB)" opacity=".75"/>'+
+    '<path d="M9 5.2l1.4-1" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".9"/></svg>';
+}
+function bombArt(){
+  return '<svg class="jewel" viewBox="0 0 24 24" aria-hidden="true"><defs>'+
+    '<radialGradient id="hmBombA" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#6B7392"/><stop offset=".45" stop-color="#2A2F45"/><stop offset="1" stop-color="#0B0D16"/></radialGradient></defs>'+
+    '<circle cx="11" cy="14.2" r="7.2" fill="url(#hmBombA)" stroke="#05060B" stroke-width=".6"/>'+
+    '<rect x="13.6" y="6.2" width="4.2" height="3.4" rx=".8" transform="rotate(40 15.7 7.9)" fill="#3A4058"/>'+
+    '<path d="M17.4 6.2c.8-2.2 2.4-3 4-2.6" fill="none" stroke="#C9A36A" stroke-width="1.2" stroke-linecap="round"/>'+
+    '<circle cx="21.4" cy="3.6" r="1.7" fill="#FFD166"/><circle cx="21.4" cy="3.6" r=".8" fill="#fff"/>'+
+    '<ellipse cx="8.6" cy="11.4" rx="2" ry="1.3" transform="rotate(-35 8.6 11.4)" fill="#fff" opacity=".35"/></svg>';
+}
+/* a few sparks thrown off a tile — decoration, so Math.random */
+function tileSparks(el,cols,n){
+  if(reduced||!el) return;
+  for(let i=0;i<n;i++){
+    const s=document.createElement('i'); s.className='spark';
+    const a=Math.random()*Math.PI*2, d=18+Math.random()*26;
+    s.style.setProperty('--dx',(Math.cos(a)*d).toFixed(1)+'px');
+    s.style.setProperty('--dy',(Math.sin(a)*d).toFixed(1)+'px');
+    s.style.setProperty('--c',cols[i%cols.length]);
+    el.appendChild(s);
+    setTimeout(()=>s.remove(),700);
+  }
+}
+function shakeBoard(el){
+  if(reduced||!el) return;
+  el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+  setTimeout(()=>el.classList.remove('shake'),450);
+}
+const SPARK_GEM=['#B9FFE0','#4FE3A1','#5EE7E7','#ffffff'], SPARK_BOOM=['#FF4D6D','#FFD166','#FF8A4C','#ffffff'];
+
 /* ==========================================================
    14 · MINES
    ========================================================== */
@@ -3578,7 +3689,7 @@ function revealMines(hitIdx){
   const open=cells.map((c,i)=>i).filter(i=>!cells[i].classList.contains('gem') && i!==hitIdx);
   const need=mMines-(hitIdx>=0?1:0);
   open.sort(()=>Math.random()-0.5).slice(0,need).forEach(i=>{
-    cells[i].classList.add('mine','dim'); cells[i].innerHTML=ic('bomb',17);
+    cells[i].classList.add('mine','dim'); cells[i].innerHTML=bombArt();
   });
   cells.forEach(c=>{ c.disabled=true; if(!c.classList.contains('gem') && !c.classList.contains('mine')) c.classList.add('dim'); });
 }
@@ -3590,12 +3701,14 @@ function pickTile(i){
   mLeft--;
   if(safe){
     mSafe--; mFound++;
-    cell.classList.add('gem'); cell.innerHTML=ic('gem',17); cell.disabled=true;
+    cell.classList.add('gem'); cell.innerHTML=gemArt(); cell.disabled=true;
+    tileSparks(cell,SPARK_GEM,8);
     SFX.gem(); minesRead();
     if(mFound===25-mMines) cashMines();
   } else {
     mLive=false;
-    cell.classList.add('mine'); cell.innerHTML=ic('bomb',17);
+    cell.classList.add('mine'); cell.innerHTML=bombArt();
+    tileSparks(cell,SPARK_BOOM,12); shakeBoard($('mGrid'));
     revealMines(i); minesEnd(); noteRound({gems:mFound}); endRound('mines',mBet,0,false);
   }
 }
@@ -3700,15 +3813,17 @@ function climb(r,c){
   const safe=chance((tCfg.n-tCfg.b)/tCfg.n);
   const others=tiles.map((t,i)=>i).filter(i=>i!==c).sort(()=>Math.random()-0.5);
   if(safe){
-    tiles[c].classList.add('safe'); tiles[c].innerHTML=ic('check',15);
-    others.slice(0,tCfg.b).forEach(i=>{ tiles[i].classList.add('bomb','dim'); tiles[i].innerHTML=ic('bomb',15); });
+    tiles[c].classList.add('safe'); tiles[c].innerHTML=gemArt();
+    tileSparks(tiles[c],SPARK_GEM,7);
+    others.slice(0,tCfg.b).forEach(i=>{ tiles[i].classList.add('bomb','dim'); tiles[i].innerHTML=bombArt(); });
     others.slice(tCfg.b).forEach(i=>tiles[i].classList.add('dim'));
     tLevel++; SFX.gem(); towersRead();
     if(tLevel>=TROWS) cashTowers(); else armRow(tLevel);
   } else {
     tLive=false;
-    tiles[c].classList.add('bomb'); tiles[c].innerHTML=ic('bomb',15);
-    others.slice(0,tCfg.b-1).forEach(i=>{ tiles[i].classList.add('bomb','dim'); tiles[i].innerHTML=ic('bomb',15); });
+    tiles[c].classList.add('bomb'); tiles[c].innerHTML=bombArt();
+    tileSparks(tiles[c],SPARK_BOOM,12); shakeBoard($('tower'));
+    others.slice(0,tCfg.b-1).forEach(i=>{ tiles[i].classList.add('bomb','dim'); tiles[i].innerHTML=bombArt(); });
     tiles.forEach(t=>{ if(!t.classList.contains('bomb')) t.classList.add('dim'); });
     towersEnd(); noteRound({level:tLevel,risk:$('tDiff').value}); endRound('towers',tBet,0,false);
   }
@@ -4540,6 +4655,31 @@ $('pkGo').onclick = () => { pkStage==='draw' ? pkDraw() : pkDeal(); };
 /* ==========================================================
    23 · CROSSING  ·  risk low → extreme
    ========================================================== */
+/* the runners, drawn facing right; the car comes down the lane nose first */
+const PETS={
+  chicken:{n:'Chicken', svg:'<path d="M4.6 10.6 2.4 8.2l.5 4.1z" fill="#E6E1D2"/><ellipse cx="11" cy="14" rx="7" ry="5.8" fill="#F7F5EC" stroke="#BDB6A2" stroke-width=".6"/><circle cx="16.2" cy="8.4" r="3.7" fill="#F7F5EC" stroke="#BDB6A2" stroke-width=".6"/><path d="M14.4 5.2c.3-1.6 1.6-1.9 1.9-.5.6-1.2 1.9-.8 1.7.7" fill="#FF4D6D"/><path d="M19.6 8.4l2.6 1-2.6 1z" fill="#F2B544"/><circle cx="19.2" cy="11" r=".9" fill="#FF4D6D"/><circle cx="17.2" cy="7.9" r=".75" fill="#1B2544"/><path d="M6.8 13c2.6-1.1 5.2-.6 6.6 1.5-2 1.6-4.8 1.8-6.6-1.5z" fill="#E2DCCB"/><path d="M10 19.4v2.4M13 19.4v2.4M9 21.8h2.2M12 21.8h2.2" stroke="#F2B544" stroke-width="1.1" stroke-linecap="round"/>'},
+  frog:{n:'Frog', svg:'<ellipse cx="12" cy="15.2" rx="8.6" ry="5.8" fill="#4FE3A1" stroke="#1E8A5B" stroke-width=".7"/><ellipse cx="12" cy="17.6" rx="5.2" ry="2.3" fill="#C8FFE5" opacity=".75"/><circle cx="8.6" cy="9.8" r="2.6" fill="#4FE3A1" stroke="#1E8A5B" stroke-width=".7"/><circle cx="15.4" cy="9.8" r="2.6" fill="#4FE3A1" stroke="#1E8A5B" stroke-width=".7"/><circle cx="9" cy="9.6" r="1.1" fill="#1B2544"/><circle cx="15.8" cy="9.6" r="1.1" fill="#1B2544"/><path d="M8.2 15.2c2.4 1.5 5.2 1.5 7.6 0" stroke="#1E8A5B" stroke-width=".9" fill="none" stroke-linecap="round"/><path d="M3.8 20h3.4M16.8 20h3.4" stroke="#1E8A5B" stroke-width="1.5" stroke-linecap="round"/>'},
+  duck:{n:'Duckling', svg:'<ellipse cx="10.6" cy="14.6" rx="7.2" ry="5.4" fill="#FFD84D" stroke="#C79A12" stroke-width=".6"/><circle cx="15.6" cy="8.8" r="3.9" fill="#FFD84D" stroke="#C79A12" stroke-width=".6"/><path d="M18.8 9.4c1.6-.3 3-.1 3.6.7-.8.9-2.3 1.2-3.8.9z" fill="#FF8A3D"/><circle cx="16.6" cy="8" r=".8" fill="#1B2544"/><path d="M6.4 13.6c2.4-1 4.8-.5 6.2 1.4-1.9 1.4-4.4 1.6-6.2-1.4z" fill="#F2C23A"/><path d="M14.6 5.2c.4-.9 1.2-1.2 1.6-.6" stroke="#C79A12" stroke-width=".7" fill="none" stroke-linecap="round"/><path d="M9.6 19.8v1.8M12.6 19.8v1.8M8.6 21.6h2.4M11.6 21.6h2.4" stroke="#FF8A3D" stroke-width="1.1" stroke-linecap="round"/>'},
+  bunny:{n:'Bunny', svg:'<path d="M13.2 7.4c-.6-3.4.2-5.6 1.6-5.6s1.6 2.6.4 5.8z" fill="#E9EDF9" stroke="#AEB6CC" stroke-width=".6"/><path d="M15.4 7.6c.4-3.4 1.8-5.2 3.1-4.8s.9 2.8-.9 5.6z" fill="#E9EDF9" stroke="#AEB6CC" stroke-width=".6"/><path d="M14 6.6c-.3-2 .1-3.4.7-3.4s.7 1.5.2 3.4z" fill="#FFB3C2"/><ellipse cx="10.4" cy="14.6" rx="7" ry="5.6" fill="#E9EDF9" stroke="#AEB6CC" stroke-width=".6"/><circle cx="15.8" cy="10" r="3.8" fill="#E9EDF9" stroke="#AEB6CC" stroke-width=".6"/><circle cx="17" cy="9.4" r=".8" fill="#1B2544"/><circle cx="19.4" cy="10.8" r=".7" fill="#FF7A94"/><circle cx="3.6" cy="13.4" r="1.8" fill="#fff" stroke="#AEB6CC" stroke-width=".5"/><path d="M8 19.6h3M12.4 19.6h3" stroke="#AEB6CC" stroke-width="1.5" stroke-linecap="round"/>'}
+};
+const petArt=id=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+(PETS[id]||PETS.chicken).svg+'</svg>';
+const carArt=()=>'<svg viewBox="0 0 20 28" aria-hidden="true"><rect x="2" y="1.5" width="16" height="25" rx="5" fill="#FF4D6D" stroke="#8E1B2E" stroke-width=".8"/><rect x="4.2" y="15.5" width="11.6" height="6.4" rx="1.6" fill="#9FD8FF" opacity=".9"/><rect x="4.6" y="6" width="10.8" height="4.4" rx="1.2" fill="#7ABDE0" opacity=".85"/><rect x="3.4" y="24.4" width="3.4" height="1.6" rx=".6" fill="#FFF3C4"/><rect x="13.2" y="24.4" width="3.4" height="1.6" rx=".6" fill="#FFF3C4"/><rect x="0" y="5" width="2.4" height="5" rx="1" fill="#1B2544"/><rect x="17.6" y="5" width="2.4" height="5" rx="1" fill="#1B2544"/><rect x="0" y="18" width="2.4" height="5" rx="1" fill="#1B2544"/><rect x="17.6" y="18" width="2.4" height="5" rx="1" fill="#1B2544"/></svg>';
+function petPick(){
+  const box=$('petPick'); if(!box) return;
+  const cur=PETS[S.pet]?S.pet:'chicken';
+  box.innerHTML='';
+  for(const id of Object.keys(PETS)){
+    const b=document.createElement('button');
+    b.setAttribute('aria-pressed',id===cur?'true':'false'); b.setAttribute('aria-label',PETS[id].n); b.title=PETS[id].n;
+    b.disabled=xLive; b.innerHTML=petArt(id);
+    b.onclick=()=>{ if(xLive) return; S.pet=id; save(); SFX.tap(); petPick(); const hero=$('hero'); if(hero) hero.innerHTML=petArt(id); };
+    box.appendChild(b);
+  }
+}
+function crossDust(lane){
+  if(reduced||!lane) return;
+  const d=document.createElement('i'); d.className='dust'; lane.appendChild(d); setTimeout(()=>d.remove(),500);
+}
 const XDIFF={ low:{p:.95,n:24}, med:{p:.88,n:20}, high:{p:.80,n:16}, extreme:{p:.65,n:12}, nightmare:{p:.50,n:10} };
 let xLive=false, xBet=0, xLane=0, xCfg=XDIFF.med;
 const xMult=(cfg,k)=>k===0?1:Math.floor(0.99/Math.pow(cfg.p,k)*100)/100;
@@ -4548,7 +4688,7 @@ function buildLanes(){
   const box=$('lanes'); box.innerHTML='';
   const kerb=document.createElement('div');
   kerb.className='lane kerb'; kerb.innerHTML='<b>START</b>';
-  const hero=document.createElement('div'); hero.className='hero'; hero.id='hm-hero'; hero.innerHTML=ic('chip',24);
+  const hero=document.createElement('div'); hero.className='hero'; hero.id='hm-hero'; hero.innerHTML=petArt(S.pet);
   kerb.appendChild(hero); box.appendChild(kerb);
   for(let i=1;i<=xCfg.n;i++){
     const l=document.createElement('div'); l.className='lane';
@@ -4556,7 +4696,7 @@ function buildLanes(){
     l.onclick=()=>{ if(xLive&&i===xLane+1) hop(); };
     box.appendChild(l);
   }
-  crossRead();
+  crossRead(); petPick();
 }
 $('xDiff').onchange=()=>{ if(!xLive) buildLanes(); };
 function crossRead(){
@@ -4572,13 +4712,31 @@ function crossRead(){
   if(xLive) $('xCashBtn').textContent = xLane?'Cash out '+usd(xBet*m):'Cash out';
   $('xCashBtn').disabled = !(xLive&&xLane>0);
 }
+/* the runner leaps from its lane to the next in an arc, squashes as it lands
+   and kicks up a little dust. Moving it to the next lane's box is a jump cut;
+   the arc is drawn back from where it was (FLIP), so it reads as one leap. */
 function moveHero(to, dead){
   const hero=$('hero'), lane=$('lanes').children[to];
   if(!hero||!lane) return;
+  const from=hero.getBoundingClientRect();
+  hero.classList.remove('splat','cheer');
   lane.appendChild(hero);
-  hero.classList.remove('hop'); void hero.offsetWidth;
-  hero.classList.add(dead?'splat':'hop');
+  const now=hero.getBoundingClientRect(), dx=from.left-now.left;
   if(lane.scrollIntoView) lane.scrollIntoView({behavior:reduced?'auto':'smooth',block:'nearest',inline:'center'});
+  const land=()=>{
+    if(!dead){ crossDust(lane); return; }
+    /* it is in the road: the car comes down the lane and flattens it */
+    const car=document.createElement('div'); car.className='car zoom'; car.innerHTML=carArt();
+    lane.appendChild(car); setTimeout(()=>car.remove(),650);
+    setTimeout(()=>{ hero.classList.add('splat'); tileSparks(lane,['#ffffff','#F7F5EC','#FFD84D','#FF4D6D'],10); },170);
+  };
+  if(reduced||!hero.animate){ land(); return; }
+  hero.animate([
+    {transform:'translateX(calc(-50% + '+dx+'px)) translateY(0) scale(1,1)'},
+    {transform:'translateX(calc(-50% + '+(dx*.55)+'px)) translateY(-30px) scale(.94,1.08)',offset:.45},
+    {transform:'translateX(-50%) translateY(0) scale(1.18,.82)',offset:.82},
+    {transform:'translateX(-50%) translateY(0) scale(1,1)'}
+  ],{duration:330,easing:'cubic-bezier(.3,.7,.4,1)'}).onfinish=land;
 }
 function hop(){
   if(!xLive) return;
@@ -4588,11 +4746,6 @@ function hop(){
     if(xLane>=xCfg.n) cashCross();
   } else {
     xLive=false;
-    const lane=$('lanes').children[next];
-    if(lane){
-      const car=document.createElement('div'); car.className='car zoom'; car.innerHTML=ic('truck',24);
-      lane.appendChild(car); setTimeout(()=>car.remove(),600);
-    }
     moveHero(next,true); SFX.pop();
     crossEnd(); noteRound({lane:xLane,lanes:xCfg.n,risk:$('xDiff').value}); endRound('cross',xBet,0,false);
   }
@@ -4600,10 +4753,14 @@ function hop(){
 function cashCross(){
   if(!xLive||xLane===0) return;
   xLive=false; const m=xMult(xCfg,xLane);
+  /* made it: a happy little bounce where it stands */
+  const hero=$('hero');
+  if(hero&&!reduced){ hero.classList.remove('cheer'); void hero.offsetWidth; hero.classList.add('cheer');
+    tileSparks(hero.parentElement,SPARK_GEM,10); }
   crossEnd(); noteRound({lane:xLane,lanes:xCfg.n,risk:$('xDiff').value}); endRound('cross',xBet,m,true);
 }
 function crossEnd(){
-  xLive=false; lockUI(false); $('xDiff').disabled=false;
+  xLive=false; lockUI(false); $('xDiff').disabled=false; petPick();
   $('xGo').textContent='Place bet'; $('xGo').className='go';
   $('xCashBtn').classList.add('hide'); $('xNext').textContent='—';
   [...$('lanes').children].forEach(l=>l.classList.remove('next'));
@@ -4616,7 +4773,7 @@ async function crossAuto(){
 function crossFire(){
   const bet=takeBet(); if(!bet) return false;
   xBet=bet; xLane=0; buildLanes(); xLive=true;
-  lockUI(true); $('xDiff').disabled=true;
+  lockUI(true); $('xDiff').disabled=true; petPick();
   $('xGo').textContent = auto.on?'Auto crossing…':'Hop →';
   $('xCashBtn').classList.remove('hide');
   SFX.tap(); crossRead();
@@ -4839,7 +4996,7 @@ function coinSVG(face){
 let coinFaceUp='H', coinT=null, coinPend=null;
 function coinRender(){
   $('coinFace').innerHTML =
-    '<div class="coin3d" id="coin3d">'+
+    '<div class="coin3d" id="hm-coin3d">'+   /* hm- prefixed, or coinShow never finds it and the coin never flips */
       '<div class="cface front">'+coinSVG(coinFaceUp)+'</div>'+
       '<div class="cface back">'+coinSVG(coinFaceUp==='H'?'T':'H')+'</div>'+
     '</div>';
@@ -4929,6 +5086,18 @@ const CASES={
 const TIERCOL=['#5A6party','#6B7799','#4FA0C4','#4FE3A1','#9B7BFF','#F2B544','#FF7A3D','#FF4D6D'];
 TIERCOL[0]='#5A6580';
 const caseCfg=()=>CASES[$('caseTier').value];
+/* what is actually in the case, one prize per tier from scrap to the crown */
+const CASE_ART=[
+  {n:'Scrap', svg:'<path d="M8 3.2h8l4 6.8-4 6.8H8L4 10z" fill="#8A93AB" stroke="#4B5268" stroke-width=".8"/><circle cx="12" cy="10" r="3.1" fill="#2A2F45"/><path d="M9 20.6h6" stroke="#6B7392" stroke-width="1.6" stroke-linecap="round"/>'},
+  {n:'Coin', svg:'<circle cx="12" cy="12" r="8.6" fill="#C9D2E6" stroke="#7E89A6"/><circle cx="12" cy="12" r="6.2" fill="none" stroke="#9AA6C4"/><path d="M12 7.6v8.8M14.2 9.4c-.4-.7-1.2-1.1-2.2-1.1-1.3 0-2.2.7-2.2 1.7s.8 1.5 2.2 1.8 2.2.8 2.2 1.8-.9 1.7-2.2 1.7c-1 0-1.8-.4-2.3-1.1" stroke="#5E6A8A" stroke-width="1.2" fill="none" stroke-linecap="round"/>'},
+  {n:'Watch', svg:'<rect x="9" y="2" width="6" height="20" rx="1.6" fill="#3B6E8F"/><circle cx="12" cy="12" r="6.2" fill="#E6F0F8" stroke="#4FA0C4" stroke-width="1.7"/><path d="M12 8.8v3.4l2.1 1.3" stroke="#1B2544" stroke-width="1.2" stroke-linecap="round" fill="none"/><rect x="18" y="11" width="1.6" height="2.2" rx=".5" fill="#4FA0C4"/>'},
+  {n:'Cash', svg:'<rect x="3.2" y="8.6" width="18" height="10" rx="1.6" fill="#22995F" stroke="#0F5E3B" stroke-width=".7"/><rect x="2" y="5.8" width="18" height="10" rx="1.6" fill="#4FE3A1" stroke="#0F5E3B" stroke-width=".7"/><circle cx="11" cy="10.8" r="2.6" fill="#0F5E3B" opacity=".5"/><path d="M4.6 8.2h2M15.4 13.4h2" stroke="#0F5E3B" stroke-width=".9" stroke-linecap="round" opacity=".6"/>'},
+  {n:'Gold bar', svg:'<path d="M3.6 19h11.6l-2.2-6H5.8z" fill="#D9961F" stroke="#8A5E0B" stroke-width=".7"/><path d="M8.8 13h11.6l-2.2-6h-7.2z" fill="#F2B544" stroke="#8A5E0B" stroke-width=".7"/><path d="M11 7.6h6.8l.8 2.2h-8.4z" fill="#FFE9B0" opacity=".7"/>'},
+  {n:'Sports car', svg:'<path d="M2.4 15.6v-2.2c0-.8.5-1.4 1.3-1.6l3.2-.7 2.6-2.6c.4-.4.9-.6 1.4-.6h4.3c.6 0 1.1.3 1.4.7l2 2.5 2.2.5c.8.2 1.3.9 1.3 1.7v2.3z" fill="#FF4D6D" stroke="#8E1B2E" stroke-width=".7"/><path d="M10.3 9h4.9l1.6 2.1H8.4z" fill="#9FD8FF" opacity=".9"/><path d="M4 13.4h3" stroke="#FFE3EA" stroke-width=".8" stroke-linecap="round"/><circle cx="7" cy="16" r="2.3" fill="#1B2544" stroke="#C9D2E6" stroke-width=".9"/><circle cx="17" cy="16" r="2.3" fill="#1B2544" stroke="#C9D2E6" stroke-width=".9"/>'},
+  {n:'Diamond', svg:'<path d="M4.8 9 8 4.8h8L19.2 9 12 19.6z" fill="#BFEFFF" stroke="#3A8FB8" stroke-width=".7" stroke-linejoin="round"/><path d="M4.8 9h14.4M8 4.8 9.6 9 12 19.6M16 4.8 14.4 9 12 19.6M9.6 9 12 4.8 14.4 9" stroke="#3A8FB8" stroke-width=".5" fill="none"/><path d="M8 4.8h4L9.6 9H4.8z" fill="#fff" opacity=".75"/><path d="M20 3.4l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5z" fill="#fff"/>'},
+  {n:'Crown', svg:'<path d="M3 17 4.2 8l4.6 4L12 6l3.2 6 4.6-4L21 17z" fill="#F2B544" stroke="#8A5E0B" stroke-width=".8" stroke-linejoin="round"/><rect x="3" y="17" width="18" height="2.7" rx=".8" fill="#D9961F" stroke="#8A5E0B" stroke-width=".6"/><circle cx="12" cy="13" r="1.5" fill="#FF4D6D"/><circle cx="7.4" cy="14.3" r="1" fill="#5EE7E7"/><circle cx="16.6" cy="14.3" r="1" fill="#5EE7E7"/><circle cx="12" cy="5.6" r=".9" fill="#FFE9B0"/>'}
+];
+const caseArt=(i,sz)=>'<svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" aria-hidden="true">'+CASE_ART[i].svg+'</svg>';
 function caseDraw(cfg){
   const tot=cfg.w.reduce((a,b)=>a+b,0);
   let r=Math.random()*tot;
@@ -4936,14 +5105,15 @@ function caseDraw(cfg){
   return 0;
 }
 function caseItem(cfg, i, w){
-  return '<div class="citem" style="--tier:'+TIERCOL[i]+'"><b>'+fmtX(cfg.m[i])+'×</b>'+
-         '<span>'+(cfg.m[i]>=1?'win':'scrap')+'</span></div>';
+  return '<div class="citem" style="--tier:'+TIERCOL[i]+';--glow:'+hexA(TIERCOL[i],.42)+'">'+
+         '<div class="cart">'+caseArt(i,36)+'</div><b>'+fmtX(cfg.m[i])+'×</b>'+
+         '<span>'+CASE_ART[i].n+'</span></div>';
 }
 function caseSetup(){
   const cfg=caseCfg(), tot=cfg.w.reduce((a,b)=>a+b,0);
   $('caseOdds').innerHTML = cfg.m.map((m,i)=>{
     const p=cfg.w[i]/tot*100;
-    return '<div class="co" style="--tier:'+TIERCOL[i]+'"><b>'+fmtX(m)+'×</b><span>'+
+    return '<div class="co" style="--tier:'+TIERCOL[i]+'"><i class="coart">'+caseArt(i,18)+'</i><b>'+fmtX(m)+'×</b><span>'+
       (p>=1?p.toFixed(1)+'%':'1 in '+Math.round(tot/cfg.w[i]).toLocaleString('en-US'))+'</span></div>';
   }).join('');
   const strip=$('caseStrip');
@@ -4986,7 +5156,9 @@ async function caseFire(){
   $('caseOut').textContent='Cracking it open…';
   await caseSpin(cfg, idx);
   const m=cfg.m[idx];
-  $('caseOut').innerHTML='Pulled <b style="color:'+TIERCOL[idx]+'">'+fmtX(m)+'×</b> — '+usd(bet*m);
+  $('caseOut').innerHTML='Pulled '+caseArt(idx,18)+' <b style="color:'+TIERCOL[idx]+'">'+CASE_ART[idx].n+' '+fmtX(m)+'×</b> — '+usd(bet*m);
+  /* the card it stopped on, lit up */
+  const won=$('caseStrip').children[38]; if(won) won.classList.add('won');
   lockUI(false); $('caseGo').disabled=false; $('caseTier').disabled=false;
   noteRound({topItem: idx===cfg.m.length-1});
   endRound('cases', bet, m, m>0);
@@ -5397,7 +5569,9 @@ function payFor(key,n){
 function buildWheel(){
   const step=360/37, cx=50, cy=50, r=48;
   const pt=(a,rr)=>[cx+rr*Math.cos((a-90)*Math.PI/180), cy+rr*Math.sin((a-90)*Math.PI/180)];
-  let out='<svg viewBox="0 0 100 100"><g id="wheelG">';
+  /* every id in here needs the hm- prefix: $() looks them up with it, and
+     without it the wheel and the ball were never found and never turned */
+  let out='<svg viewBox="0 0 100 100"><g id="hm-wheelG">';
   WHEEL.forEach((n,i)=>{
     const a0=i*step-step/2, a1=i*step+step/2;
     const [x0,y0]=pt(a0,r), [x1,y1]=pt(a1,r);
@@ -5415,7 +5589,7 @@ function buildWheel(){
   /* the rim the ball runs on stays put while the wheel turns underneath it */
   out+='<circle cx="50" cy="50" r="43.6" fill="none" stroke="'+hexA(THEME.paper,.13)+'" stroke-width="3.4"/>'+
        '<circle cx="50" cy="50" r="49.4" fill="none" stroke="'+THEME.ink4+'" stroke-width="1.2"/>'+
-       '<g id="ballG"><circle id="ball" cx="50" cy="6.4" r="2.6" fill="#F7F5EC" stroke="#7E869B" stroke-width=".45"/></g>';
+       '<g id="hm-ballG"><circle id="hm-ball" cx="50" cy="6.4" r="2.6" fill="#F7F5EC" stroke="#7E869B" stroke-width=".45"/></g>';
   out+='</svg>';
   $('wheelHost').innerHTML=out;
 }
@@ -19636,7 +19810,7 @@ function buildProfile(){
       '<span class="ad">'+(ac.h?ac.h:(ac.hd&&!has?'':ac.d))+'</span>'+bar+'</span>';
     a.appendChild(d);
   }
-  $('achcount').textContent='\u00b7 '+got+' of '+listed+(waiting?'  \u00b7  '+waiting+' to claim':'')+'  \u00b7  build washout-38';
+  $('achcount').textContent='\u00b7 '+got+' of '+listed+(waiting?'  \u00b7  '+waiting+' to claim':'')+'  \u00b7  build washout-39';
   /* one listener on the grid does every CLAIM button in it */
   if(!a.dataset.claimWired){
     a.dataset.claimWired='1';
@@ -21109,6 +21283,12 @@ function closeHelp(){
    Add an entry at the top with every build. House Money reads the same list
    through TANKDUEL.news, so it is written once. */
 const NEWS=[
+  {build:'washout-39', title:'House Money: fixes and new looks',
+   notes:['Fixed: the Roulette wheel and ball never spun, and the Coin Flip coin never flipped. Both animate again.',
+          'Fixed: in Crash you could not see where the rocket takes off. It now waits on a lit launch pad, and the whole flight stays on screen.',
+          'Mines and Towers: raised tiles that flip over onto a glowing emerald, or a bomb that goes off and shakes the board. Towers shows which row you are on.',
+          'Cases: every prize has a picture, from scrap and coins up to a sports car, a diamond and the crown.',
+          'Crossing: pick your runner (chicken, frog, duckling or bunny). It leaps lane to lane, a car comes down the road when it loses, and it bounces when you cash out.']},
   {build:'washout-38', title:'House Money fits every phone',
    notes:['The House Money header now uses two rows on a phone: balance, jackpot and To the field always fit on screen.',
           'House Money and the battlefield stay clear of the phone\'s clock, battery, notch and home bar.',
