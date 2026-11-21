@@ -176,6 +176,19 @@
     box-shadow:0 6px 20px rgba(0,0,0,.35)}
   #mdrivein{font-size:.4em;letter-spacing:.18em;opacity:.5;user-select:none}
   #mdrive.on{border-color:rgba(255,184,77,.75);background:linear-gradient(180deg,rgba(46,32,20,.7),rgba(20,12,8,.8))}
+  /* Phone mode: finger-sized buttons in the bottom-right corner — FIRE, the
+     flare, cancel and the side column. The barrel nudges keep their size. */
+  body.mob #cancel, body.mob #flare{font-size:1.6em}
+  body.mob #fire{font-size:1.5em;position:relative}
+  body.mob #util{bottom:6.6em;gap:.5em}
+  body.mob #util .btn{font-size:2em}
+  /* the drive strip floats over the left of the bottom bar; keep that much of
+     the bar empty, or the strip lies over the first weapon and eats its taps */
+  body.mob #bottom > .grp:first-child{min-width:calc(26% - .4em)}
+  /* swiping up off a held FIRE cancels the shot; the button shows it coming */
+  body.mob #fire.swiping{color:transparent;background:linear-gradient(#5a4a5f,#33232c)}
+  body.mob #fire.swiping::after{content:'\25B2  CANCEL';position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;color:#f3ecff;font-size:.62em;letter-spacing:.06em}
   /* ---- settings ---- */
   .setrow{display:flex;align-items:center;gap:1em;width:min(34em,92%);text-align:left;
     background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:.8em;padding:.6em .8em}
@@ -19212,9 +19225,33 @@ function cancelShot(){
   updateHUD();
 }
 const fireBtn=$('fire');
-fireBtn.addEventListener('pointerdown',e=>{ e.preventDefault(); fireBtn.classList.add('held'); startCharge(); });
-['pointerup','pointercancel','pointerleave'].forEach(ev=>
-  fireBtn.addEventListener(ev,()=>{ fireBtn.classList.remove('held'); releaseCharge(); }));
+/* Phone mode: hold FIRE, then swipe up to call the shot off. The finger is
+   held by the button, so sliding off it no longer counts as letting go. Up is
+   the game's up, measured through localPt, since the stage may be turned. */
+let fireSwipe=null;      // {y0, gone} while a phone-mode finger is on FIRE
+fireBtn.addEventListener('pointerdown',e=>{
+  e.preventDefault(); fireBtn.classList.add('held');
+  if(mobile){
+    try{ fireBtn.setPointerCapture(e.pointerId); }catch(err){}
+    fireSwipe={y0:localPt(e,stage).y, gone:false};
+  }
+  startCharge();
+});
+fireBtn.addEventListener('pointermove',e=>{
+  if(!fireSwipe||fireSwipe.gone||!charging) return;
+  const up=fireSwipe.y0-localPt(e,stage).y, need=Math.max(30,fireBtn.offsetHeight*1.1);
+  fireBtn.classList.toggle('swiping',up>need*.35);
+  if(up>=need){ fireSwipe.gone=true; fireBtn.classList.remove('held','swiping'); cancelShot(); }
+});
+const fireUp=()=>{
+  const gone=!!(fireSwipe&&fireSwipe.gone);
+  fireSwipe=null; fireBtn.classList.remove('held','swiping');
+  if(!gone) releaseCharge();
+};
+fireBtn.addEventListener('pointerup',fireUp);
+fireBtn.addEventListener('pointercancel',fireUp);
+/* without the phone-mode hold, leaving the button still lets the shot go */
+fireBtn.addEventListener('pointerleave',()=>{ if(!fireSwipe) fireUp(); });
 $('cancel').addEventListener('click',cancelShot);
 $('flare').addEventListener('click',()=>{ popFlare(hero()); });
 
