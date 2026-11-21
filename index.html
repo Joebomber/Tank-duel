@@ -151,12 +151,22 @@
   /* the card opens on the duel alone and only draws itself over the top once the
      two of them have traded a few shots — hence the separate veil, which fades
      in with the title rather than being part of the layer itself */
-  /* ---- phone controls -------------------------------------------------
-     A strip you slide left and right to drive, and a stick on the right you
-     can swing through a full circle to aim. Both sit above the canvas but
-     below every menu sheet, so they never cover a dialog. */
-  /* the drag surfaces replace the pad, so the arrows and the aim nudges go */
-  body.mob #left, body.mob #right, body.mob #up, body.mob #down{display:none}
+  /* ---- phone mode -----------------------------------------------------
+     A strip you slide left and right to drive; aiming is a drag on the
+     battlefield, as it is with a mouse. The strip sits above the canvas but
+     below every menu sheet, so it never covers a dialog. (Until build 37 there
+     was also an aim stick in the bottom-right corner — it sat over FIRE.) */
+  /* the strip replaces the drive arrows; the barrel nudges stay for fine aim */
+  body.mob #left, body.mob #right{display:none}
+  /* Phone mode always plays sideways. Held upright, the stage is laid out as
+     landscape and turned a quarter turn to fill the screen, so it works even
+     with the phone's rotation lock on. Turn the phone and the browser goes
+     landscape itself, and the turn comes off. */
+  @media (orientation:portrait){
+    body.mob #stage{width:min(100vh,calc(100vw * 16 / 9));width:min(100dvh,calc(100vw * 16 / 9));
+      height:auto;max-width:none;max-height:none;aspect-ratio:16/9;flex:none;
+      transform:rotate(90deg);border-radius:0;box-shadow:none}
+  }
   #mobile{position:absolute;inset:0;z-index:25;pointer-events:none}
   #mobile.hide{display:none}
   #mdrive{position:absolute;left:2%;bottom:2.5%;width:24%;height:7.5%;min-height:44px;max-height:66px;
@@ -166,18 +176,13 @@
     box-shadow:0 6px 20px rgba(0,0,0,.35)}
   #mdrivein{font-size:.4em;letter-spacing:.18em;opacity:.5;user-select:none}
   #mdrive.on{border-color:rgba(255,184,77,.75);background:linear-gradient(180deg,rgba(46,32,20,.7),rgba(20,12,8,.8))}
-  #mstick{position:absolute;right:2.5%;bottom:2.5%;width:23vmin;height:23vmin;
-    max-width:132px;max-height:132px;min-width:88px;min-height:88px;
-    pointer-events:auto;touch-action:none;border-radius:50%;
-    background:radial-gradient(circle,rgba(20,16,38,.66),rgba(10,8,20,.78));
-    border:1px solid rgba(190,170,255,.28);box-shadow:0 6px 20px rgba(0,0,0,.35)}
-  #mring{position:absolute;inset:12%;border-radius:50%;border:1px dashed rgba(190,170,255,.25)}
-  #mknob{position:absolute;width:26%;height:26%;left:37%;top:37%;border-radius:50%;
-    background:radial-gradient(circle at 35% 35%,#ffd9a0,#ff9a2e);
-    box-shadow:0 2px 10px rgba(255,150,40,.5);pointer-events:none}
-  #maim{position:absolute;left:0;right:0;top:-1.6em;text-align:center;
-    font-size:.55em;letter-spacing:.14em;opacity:.8;pointer-events:none}
-  @media (prefers-reduced-motion:reduce){ #mknob{transition:none} }
+  /* ---- settings ---- */
+  .setrow{display:flex;align-items:center;gap:1em;width:min(34em,92%);text-align:left;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:.8em;padding:.6em .8em}
+  .settxt{flex:1;display:flex;flex-direction:column;gap:.15em}
+  .settxt b{font-size:.8em;letter-spacing:.06em}
+  .settxt span{font-size:.58em;opacity:.65;line-height:1.4}
+  .setrow .btn{min-width:4.6em;padding:.42em .8em}
   #intro{justify-content:center;gap:0;background:none;z-index:60;cursor:pointer;
          animation:introin .5s ease both}
   @keyframes introin{from{opacity:0}to{opacity:1}}
@@ -1296,6 +1301,25 @@
 @keyframes blip{0%,100%{opacity:1}50%{opacity:.45}}
 #hm-root .foot{font-size:11px;color:var(--muted);text-align:center;line-height:1.6}
 #hm-root .foot b{color:#9AA6CC;font-weight:600}
+#hm-root .rigpanel{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:16px;background:rgba(4,7,16,.72);backdrop-filter:blur(4px)}
+#hm-root .rigpanel.hide{display:none}
+#hm-root .rigcard{width:min(400px,100%);background:var(--ink-2);border:1px solid var(--ink-4);border-radius:14px;padding:16px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+#hm-root .righead{display:flex;align-items:center;justify-content:space-between}
+#hm-root .righead h2{font-family:var(--f-display);font-size:17px;letter-spacing:.02em}
+#hm-root .rigx{font-size:22px;line-height:1;width:32px;height:32px;border-radius:8px;color:var(--muted)}
+#hm-root .rigx:hover{background:var(--ink-3);color:var(--paper)}
+#hm-root .rigsub{font-size:12px;color:var(--muted);margin:2px 0 12px}
+#hm-root .rigrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--ink-3)}
+#hm-root .rigrow>div{flex:1;display:flex;flex-direction:column}
+#hm-root .rigrow b{font-size:14px}
+#hm-root .rigrow span{font-size:12px;color:var(--muted)}
+#hm-root .rigtog{min-width:64px;padding:8px 12px;border-radius:8px;font-family:var(--f-mono);font-weight:700;font-size:12px;letter-spacing:.06em;background:var(--ink-3);border:1px solid var(--ink-4)!important}
+#hm-root .rigtog[aria-pressed="true"]{background:var(--mint);color:var(--btnInk);border-color:var(--mint)!important}
+#hm-root #hm-rigBust[aria-pressed="true"]{background:#FFB020;color:#2A1B00;border-color:#FFB020!important}
+#hm-root .rigtog.pay{background:var(--brass);color:var(--cashInk);border-color:var(--brass)!important}
+#hm-root .rigkeys{font-size:11px;color:var(--muted);margin-top:10px;text-align:center}
+#hm-root .rigkeys kbd{font-family:var(--f-mono);background:var(--ink-3);border:1px solid var(--ink-4);border-radius:4px;padding:0 4px}
+#hm-root .brand{cursor:pointer;-webkit-user-select:none;user-select:none}
 #hm-root .toast{position:fixed;left:50%;top:16px;transform:translateX(-50%);background:var(--ink-3);border:1px solid var(--ink-4);padding:9px 15px;border-radius:999px;font-size:13px;font-weight:600;z-index:40;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;text-align:center}
 #hm-root .toast.on{opacity:1;transform:translateX(-50%) translateY(4px)}
 
@@ -1662,6 +1686,7 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
     <div id="util">
       <button class="btn" id="mute" aria-label="Toggle sound"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></button>
       <button class="btn" id="achbtn" aria-label="Achievements"><svg viewBox="0 0 24 24"><path d="M8 3h8v5a4 4 0 0 1-8 0z"/><path d="M8 5H5v2a3 3 0 0 0 3 3M16 5h3v2a3 3 0 0 1-3 3"/><path d="M12 12v4M9 20h6l-1-4h-4z"/></svg></button>
+      <button class="btn" id="setbtn" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8"/></svg></button>
       <button class="btn" id="helpbtn2" aria-label="How to play"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 1 1 3.3 2.5c-.5.2-.8.7-.8 1.3v.5"/><path d="M12 17.1v.1"/></svg></button>
       <button class="btn" id="menubtn" aria-label="New match"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M9 9h6v6H9z"/></svg></button>
     </div>
@@ -1710,7 +1735,6 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
 
   <div id="mobile" class="hide">
     <div id="mdrive"><div id="mdrivein"><span>◀  DRIVE  ▶</span></div></div>
-    <div id="mstick"><div id="mring"></div><div id="mknob"></div><div id="maim">45°</div></div>
   </div>
 
   <div class="sheet hide" id="online">
@@ -1793,7 +1817,7 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
     <div class="lbl">YOUR TANK</div>
     <div class="rack" id="rack1"></div>
     <div class="pick">
-      <button class="btn" id="mobilebtn">Phone controls: OFF</button>
+      <button class="btn" id="setbtn2">⚙ Settings</button>
       <button class="btn" id="onlinebtn">Online match</button>
       <button class="btn" id="blitzbtn">Blitz — no turns: OFF</button>
       <button class="btn" id="duobtn">Team battle 2v2: OFF</button>
@@ -1831,7 +1855,7 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
         <button class="btn" id="casinobtn">HOUSE MONEY</button>
       </div>
       <button class="btn" id="go">START</button>
-      <span id="mbuild">build washout-36</span>
+      <span id="mbuild">build washout-37</span>
     </div>
   </div>
 
@@ -1848,6 +1872,18 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
     <button class="btn" id="gback" style="padding:.42em 1.4em;margin-top:.3em">BACK</button>
   </div>
 
+  <div class="sheet hide" id="settings">
+    <h2>SETTINGS</h2>
+    <div class="setrow">
+      <div class="settxt"><b>Phone mode</b><span>Plays sideways, even with the phone held upright. Slide the strip to drive, drag the battlefield to aim, hold FIRE to shoot.</span></div>
+      <button class="btn" id="mobilebtn">OFF</button>
+    </div>
+    <div class="setrow">
+      <div class="settxt"><b>Sound</b><span>Every effect in the game.</span></div>
+      <button class="btn" id="soundbtn">ON</button>
+    </div>
+    <button class="btn" id="setback" style="padding:.42em 1.4em;margin-top:.3em">BACK</button>
+  </div>
   <div class="sheet hide" id="help">
     <h2>HOW TO PLAY</h2>
     <p>Turn-based artillery. Put shells on the other tank before it puts them on you. Everything below is optional depth &mdash; the first two cards are all you need to start.</p>
@@ -2334,6 +2370,17 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
 <div class="tick-bar"><div class="tick-in"><b>Feed</b><div class="feed" id="hm-feed"></div></div></div>
 <div id="hm-lamp" aria-hidden="true"></div>
 <div class="toast" id="hm-toast"></div>
+<!-- the house rules: five taps on the HOUSE MONEY heading, for phones that have no keyboard to type the codes on -->
+<div class="rigpanel hide" id="hm-rigPanel" role="dialog" aria-modal="true" aria-labelledby="hm-rigTitle">
+  <div class="rigcard">
+    <div class="righead"><h2 id="hm-rigTitle">House rules</h2><button class="rigx" id="hm-rigClose" aria-label="Close">×</button></div>
+    <p class="rigsub">The lamp in the bottom corner shows what is switched on.</p>
+    <div class="rigrow"><div><b>Rigged</b><span>Every round you play pays out.</span></div><button class="rigtog" id="hm-rigWin" aria-pressed="false">OFF</button></div>
+    <div class="rigrow"><div><b>Instant loss</b><span>The next step goes against you, once.</span></div><button class="rigtog" id="hm-rigBust" aria-pressed="false">OFF</button></div>
+    <div class="rigrow"><div><b>Jackpot</b><span>Pays out the whole progressive pot now.</span></div><button class="rigtog pay" id="hm-rigJack">PAY</button></div>
+    <p class="rigkeys">On a keyboard: type <kbd>rigitup</kbd> · <kbd>x</kbd> · <kbd>jack</kbd></p>
+  </div>
+</div>
 
 
 </div>
@@ -3004,16 +3051,47 @@ document.addEventListener('keydown', e=>{
   }
   /* one key arms an instant loss on the next step — press again to disarm */
   if(e.key==='x' || e.key==='X'){
-    S.bust=!S.bust; paintLamp();
+    S.bust=!S.bust; paintLamp(); syncRig();
     tone(S.bust?170:520,.08,'square',.05);
     return;
   }
   if(e.key && e.key.length===1) buf=(buf+e.key.toLowerCase()).slice(-SECRET.length);
   if(buf===SECRET){
-    buf=''; S.rig=!S.rig; paintLamp();
+    buf=''; S.rig=!S.rig; paintLamp(); syncRig();
     tone(S.rig?880:220,.09,'square',.05);
   }
 });
+/* The same three switches for a phone, which has no keyboard to type them on:
+   five quick taps on the HOUSE MONEY heading open the house rules. */
+function syncRig(){
+  const w=$('rigWin'), b=$('rigBust');
+  if(!w||!b) return;
+  w.setAttribute('aria-pressed',S.rig?'true':'false'); w.textContent=S.rig?'ON':'OFF';
+  b.setAttribute('aria-pressed',S.bust?'true':'false'); b.textContent=S.bust?'ARMED':'OFF';
+}
+function openRig(){ syncRig(); $('rigPanel').classList.remove('hide'); SFX.tap(); }
+function closeRig(){ $('rigPanel').classList.add('hide'); }
+(function(){
+  const brand=HMROOT&&HMROOT.querySelector('header.top .brand');
+  if(!brand) return;
+  let taps=0, last=0;
+  brand.addEventListener('click',()=>{
+    const now=Date.now();
+    taps=(now-last<1200)?taps+1:1; last=now;
+    if(taps>=5){ taps=0; openRig(); }
+    else if(taps>=3) toast(String(5-taps));
+  });
+  $('rigClose').onclick=closeRig;
+  $('rigPanel').addEventListener('click',e=>{ if(e.target===$('rigPanel')) closeRig(); });
+  $('rigWin').onclick=()=>{ S.rig=!S.rig; paintLamp(); syncRig(); tone(S.rig?880:220,.09,'square',.05); };
+  $('rigBust').onclick=()=>{ S.bust=!S.bust; paintLamp(); syncRig(); tone(S.bust?170:520,.08,'square',.05); };
+  $('rigJack').onclick=()=>{
+    const pot=payJackpot(S.game);
+    if(pot){ checkAch({gid:S.game, jack:pot, back:pot, profit:pot, bet:0, mult:0, won:true}); closeRig(); }
+    else toast('The pot is empty');
+  };
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('rigPanel').classList.contains('hide')) closeRig(); });
+})();
 
 /* ==========================================================
    13 · CRASH
@@ -14388,10 +14466,11 @@ function update(dt){
 /* ============================== render ============================== */
 let dpr=1, skyGrad=null, dirtGrad=null;
 function resize(){
-  const r=stage.getBoundingClientRect();
+  /* the layout width, not the on-screen box — phone mode can turn the stage */
+  const sw=stage.offsetWidth||stage.getBoundingClientRect().width;
   dpr=Math.min(2,window.devicePixelRatio||1);
   cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
-  stage.style.fontSize=Math.max(9,r.width/1280*16.5)+'px';
+  stage.style.fontSize=Math.max(9,sw/1280*16.5)+'px';
   skyGrad=null;
 }
 function buildGrads(){
@@ -19140,8 +19219,8 @@ $('cancel').addEventListener('click',cancelShot);
 $('flare').addEventListener('click',()=>{ popFlare(hero()); });
 
 function worldPt(e){
-  const r=cv.getBoundingClientRect();
-  const px=(e.clientX-r.left)/r.width*W, py=(e.clientY-r.top)/r.height*H;
+  const p=localPt(e,cv);
+  const px=p.x/p.w*W, py=p.y/p.h*H;
   return {x:(px-W/2)/cam.z+cam.x, y:(py-H/2)/cam.z+cam.y};
 }
 /* drag sets the angle AND scales power with distance; it never fires */
@@ -19190,7 +19269,7 @@ window.addEventListener('keydown',e=>{
   else if(k==='m'){ if(profOpen) closeProfile(); else openProfile(phase==='menu'?'menu':'game'); }
   else if(k==='p'){ if(!profOpen&&!helpOpen&&!tut.pause) setPaused(!paused); }
   else if(k==='h'){ helpOpen?closeHelp():openHelp(phase==='menu'?'menu':'game'); }
-  else if(k==='escape'){ if(helpOpen) closeHelp(); else if(profOpen) closeProfile(); else if(paused) setPaused(false); }
+  else if(k==='escape'){ if(setOpen) closeSettings(); else if(helpOpen) closeHelp(); else if(profOpen) closeProfile(); else if(paused) setPaused(false); }
 });
 window.addEventListener('keyup',e=>{
   if(houseUp()) return;
@@ -19289,7 +19368,7 @@ function buildProfile(){
       '<span class="ad">'+(ac.h?ac.h:(ac.hd&&!has?'':ac.d))+'</span>'+bar+'</span>';
     a.appendChild(d);
   }
-  $('achcount').textContent='\u00b7 '+got+' of '+listed+(waiting?'  \u00b7  '+waiting+' to claim':'')+'  \u00b7  build washout-36';
+  $('achcount').textContent='\u00b7 '+got+' of '+listed+(waiting?'  \u00b7  '+waiting+' to claim':'')+'  \u00b7  build washout-37';
   /* one listener on the grid does every CLAIM button in it */
   if(!a.dataset.claimWired){
     a.dataset.claimWired='1';
@@ -20758,6 +20837,21 @@ function closeHelp(){
   helpOpen=false; $('help').classList.add('hide');
   if(helpFrom==='menu') $('menu').classList.remove('hide');
 }
+let setOpen=false, setFrom='menu';
+function openSettings(from){
+  setFrom=from; setOpen=true;
+  $('menu').classList.add('hide'); $('garage').classList.add('hide');
+  syncSettings();
+  $('settings').classList.remove('hide');
+}
+function closeSettings(){
+  setOpen=false; $('settings').classList.add('hide');
+  if(setFrom==='menu') $('menu').classList.remove('hide');
+}
+function syncSettings(){
+  const s=$('soundbtn');
+  if(s){ s.textContent=muted?'OFF':'ON'; s.className='btn'+(muted?'':' on'); }
+}
 function openGarage(){
   checkWashout();      // in case the record crossed while you were away
   $('menu').classList.add('hide'); $('over').classList.add('hide');
@@ -20945,6 +21039,10 @@ $('netgo').addEventListener('click',()=>{
   netStartMatch();
 });
 $('mobilebtn').addEventListener('click',()=>{ setMobile(!mobile); });
+$('soundbtn').addEventListener('click',()=>{ toggleMute(); syncSettings(); });
+$('setbtn').addEventListener('click',()=>openSettings(phase==='menu'?'menu':'game'));
+$('setbtn2').addEventListener('click',()=>openSettings('menu'));
+$('setback').addEventListener('click',closeSettings);
 $('blitzbtn').addEventListener('click',()=>{ blitz=!blitz; buildRacks(); });
 $('duobtn').addEventListener('click',()=>{ duo=!duo; buildRacks(); });
 $('matebtn').addEventListener('click',()=>{ mateHuman=!mateHuman; buildRacks(); });
@@ -21455,26 +21553,44 @@ function netStatus(s){
                  : s;
 }
 
-/* ---- phone controls -----------------------------------------------------
-   Two drag surfaces instead of the button pad: slide the strip to drive, swing
-   the stick to aim. The stick reads as a full circle — the vector from its
-   centre is treated exactly like a drag out from the barrel pivot, so it goes
-   through the same worldToLocalAngle the mouse aim uses and lands on the same
-   hull-relative angle. */
+/* ---- phone mode -----------------------------------------------------------
+   A drag strip instead of the drive arrows; aiming is a drag on the battlefield,
+   the same as with a mouse, and the barrel nudges stay for fine aim. Build 37
+   took out the aim stick that used to sit in the bottom-right corner: it was
+   over the FIRE button. Phone mode also always plays sideways — see the
+   body.mob #stage rule. */
 let mobile=false;
-let mDrive=null;          // {x, last} while a finger is on the drive strip
-let mStick={x:0,y:0,on:false};
+let mDrive=null;          // {last} while a finger is on the drive strip
+
+/* Held upright, phone mode lays the stage out as landscape and turns it a
+   quarter turn. The browser hit-tests buttons through the turn by itself; our
+   own pointer maths has to undo it. This gives the point in the element's own,
+   unturned pixels, plus its unturned size. */
+function stageTurned(){
+  try{ return mobile && getComputedStyle(stage).transform!=='none'; }catch(e){ return false; }
+}
+function localPt(e,el){
+  const r=el.getBoundingClientRect(), w=el.offsetWidth||r.width, h=el.offsetHeight||r.height;
+  if(!stageTurned()) return {x:e.clientX-r.left, y:e.clientY-r.top, w, h};
+  /* rotate(90deg) sends an offset (u,v) from the middle to (-v,u) on screen */
+  const cx=r.left+r.width/2, cy=r.top+r.height/2;
+  return {x:w/2+(e.clientY-cy), y:h/2-(e.clientX-cx), w, h};
+}
 
 function setMobile(on){
   mobile=!!on;
   const m=$('mobile');
   if(m) m.classList.toggle('hide',!mobile||phase==='menu'||phase==='over');
   const b=$('mobilebtn');
-  if(b){ b.textContent='Phone controls: '+(mobile?'ON':'OFF'); b.className='btn'+(mobile?' on':''); }
-  /* the pad is redundant once the drag surfaces are up */
+  if(b){ b.textContent=mobile?'ON':'OFF'; b.className='btn'+(mobile?' on':''); }
+  /* the arrows are redundant once the strip is up */
   try{ document.body.classList.toggle('mob',mobile); }catch(e){}
-  if(!mobile){ held.l=0; held.r=0; mDrive=null; mStick.on=false; }
+  if(!mobile){ held.l=0; held.r=0; mDrive=null; }
   try{ localStorage.setItem('tankduel.mobile',mobile?'1':'0'); }catch(e){}
+  /* an installed app on Android can be held to landscape outright; anywhere
+     else this is refused, and the quarter turn covers it */
+  if(mobile){ try{ const o=screen.orientation; if(o&&o.lock) o.lock('landscape').catch(()=>{}); }catch(e){} }
+  resize();
 }
 /* the overlay is only up while a match is actually being played */
 function mobileVisible(){
@@ -21484,41 +21600,14 @@ function mobileVisible(){
   m.classList.toggle('hide',!show);
 }
 
-/* aim: the stick's offset from centre is the direction the barrel points */
-function mStickAim(dx,dy){
-  const t=blitz?hero():tanks[turn];
-  if(!t||!canAct()) return;
-  const d=Math.hypot(dx,dy);
-  if(d<6) return;
-  let a=worldToLocalAngle(t,dx,dy);
-  /* atan2 wraps at half a turn, so swinging the stick behind the tank comes
-     back as a large negative number and used to clamp to -45 — the near end of
-     the arc rather than the far one. Push it round so backwards reads as
-     backwards. */
-  if(a<-90) a+=360;
-  t.angle=clamp(a,-45,160);
-  setTilt(t);
-  const el=$('maim');
-  if(el) el.textContent=Math.round(worldAngleOf(t))+'°';
-  tutEvent('aimed');
-  updateHUD();
-}
-function mKnob(dx,dy,R){
-  const k=$('mknob');
-  if(!k) return;
-  const d=Math.hypot(dx,dy)||1;
-  const lim=Math.min(d,R)/d;
-  k.style.left='calc(37% + '+(dx*lim)+'px)';
-  k.style.top='calc(37% + '+(dy*lim)+'px)';
-}
 function wireMobile(){
-  const strip=$('mdrive'), stick=$('mstick');
-  if(!strip||!stick) return;
+  const strip=$('mdrive');
+  if(!strip) return;
 
   /* ---- drive: slide the strip, the tank follows ---- */
   const driveAt=e=>{
     if(!mDrive) return;
-    const x=e.clientX;
+    const x=localPt(e,strip).x;
     const dx=x-mDrive.last;
     mDrive.last=x;
     /* a nudge either way latches the drive keys; letting go stops it */
@@ -21528,7 +21617,7 @@ function wireMobile(){
   strip.addEventListener('pointerdown',e=>{
     e.preventDefault(); ac();
     try{ strip.setPointerCapture(e.pointerId); }catch(err){}
-    mDrive={last:e.clientX};
+    mDrive={last:localPt(e,strip).x};
     strip.classList.add('on');
   });
   strip.addEventListener('pointermove',e=>{ if(mDrive){ e.preventDefault(); driveAt(e); } });
@@ -21536,25 +21625,6 @@ function wireMobile(){
   strip.addEventListener('pointerup',stopDrive);
   strip.addEventListener('pointercancel',stopDrive);
   strip.addEventListener('pointerleave',e=>{ if(mDrive) stopDrive(); });
-
-  /* ---- aim: swing the stick anywhere through the full circle ---- */
-  const stickAt=e=>{
-    const r=stick.getBoundingClientRect();
-    const cx=r.left+r.width/2, cy=r.top+r.height/2;
-    const dx=e.clientX-cx, dy=e.clientY-cy;
-    mStick.x=dx; mStick.y=dy;
-    mKnob(dx,dy,r.width*.32);
-    mStickAim(dx,dy);
-  };
-  stick.addEventListener('pointerdown',e=>{
-    e.preventDefault(); ac();
-    try{ stick.setPointerCapture(e.pointerId); }catch(err){}
-    mStick.on=true; stickAt(e);
-  });
-  stick.addEventListener('pointermove',e=>{ if(mStick.on){ e.preventDefault(); stickAt(e); } });
-  const stopStick=()=>{ mStick.on=false; mKnob(0,0,1); };
-  stick.addEventListener('pointerup',stopStick);
-  stick.addEventListener('pointercancel',stopStick);
 }
 
 /* ---- title card -----------------------------------------------------------
