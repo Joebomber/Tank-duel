@@ -23,8 +23,16 @@
     border-radius:14px;overflow:hidden;background:#1a2b3d;
     box-shadow:0 0 0 1px rgba(255,255,255,.09),0 30px 70px -20px rgba(0,0,0,.85);
     font-size:16px;user-select:none}
-  @media (max-aspect-ratio:16/9){#stage{max-height:100vh}}
-  @media (min-aspect-ratio:16/9){#stage{width:auto;height:100vh;max-height:720px;aspect-ratio:16/9}}
+  /* An installed app draws under the phone's clock, battery, notch and home
+     bar; these are how much of each edge they take, and the stage stays inside
+     them. They are 0 everywhere else. */
+  :root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+        --sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
+  /* centre the stage inside what the phone leaves free, not the whole screen —
+     the clock is usually taller than the home bar */
+  body{padding:var(--sat) var(--sar) var(--sab) var(--sal)}
+  @media (max-aspect-ratio:16/9){#stage{max-height:calc(100vh - var(--sat) - var(--sab))}}
+  @media (min-aspect-ratio:16/9){#stage{width:auto;height:calc(100vh - var(--sat) - var(--sab));max-height:720px;aspect-ratio:16/9}}
   canvas{display:block;width:100%;height:100%;touch-action:none}
   .layer{position:absolute;inset:0;pointer-events:none}
   .btn,.wep,.tcard,.pill{pointer-events:auto}
@@ -163,7 +171,8 @@
      with the phone's rotation lock on. Turn the phone and the browser goes
      landscape itself, and the turn comes off. */
   @media (orientation:portrait){
-    body.mob #stage{width:min(100vh,calc(100vw * 16 / 9));width:min(100dvh,calc(100vw * 16 / 9));
+    body.mob #stage{width:min(100vh,calc(100vw * 16 / 9));
+      width:min(calc(100dvh - var(--sat) - var(--sab)),calc((100vw - var(--sal) - var(--sar)) * 16 / 9));
       height:auto;max-width:none;max-height:none;aspect-ratio:16/9;flex:none;
       transform:rotate(90deg);border-radius:0;box-shadow:none}
   }
@@ -195,6 +204,18 @@
   body.mob #fire.swiping{color:transparent;background:linear-gradient(#5a4a5f,#33232c)}
   body.mob #fire.swiping::after{content:'\25B2  CANCEL';position:absolute;inset:0;display:flex;align-items:center;
     justify-content:center;color:#f3ecff;font-size:.62em;letter-spacing:.06em}
+  /* ---- news ---- */
+  #newsdot{display:inline-block;margin-left:.5em;padding:0 .45em;border-radius:1em;font-size:.8em;
+    background:#ff5b6e;color:#fff;letter-spacing:.06em;line-height:1.5}
+  #newsdot.hide{display:none}
+  #newslist{display:flex;flex-direction:column;gap:.5em;width:min(38em,94%);text-align:left}
+  .newsitem{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:.8em;padding:.6em .85em}
+  .newsitem.latest{border-color:rgba(255,184,77,.55);background:rgba(255,184,77,.06)}
+  .newshead{display:flex;align-items:baseline;gap:.6em;margin-bottom:.3em}
+  .newstag{font-family:'Bungee',sans-serif;font-size:.6em;color:#ffb84d;letter-spacing:.04em;white-space:nowrap}
+  .newshead b{font-size:.78em}
+  .newsitem ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:.2em}
+  .newsitem li{font-size:.6em;line-height:1.45;opacity:.82}
   /* ---- settings ---- */
   .setrow{display:flex;align-items:center;gap:1em;width:min(34em,92%);text-align:left;
     background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:.8em;padding:.6em .8em}
@@ -1328,7 +1349,7 @@
    beside it when the phone is on its side. */
 /* both ways round: slim chrome, packed controls, smaller boards */
 @media (max-width:600px),(max-height:500px){
-#hm-root.hm-play .shell{padding:6px 8px 8px;gap:6px}
+#hm-root.hm-play .shell{padding:calc(6px + var(--sat,0px)) calc(8px + var(--sar,0px)) 8px calc(8px + var(--sal,0px));gap:6px}
 #hm-root.hm-play .tick-bar,#hm-root.hm-play .foot{display:none}
 #hm-root.hm-play .top{gap:6px}
 #hm-root.hm-play .brand{gap:6px}
@@ -1371,7 +1392,7 @@
 }
 /* upright: the controls pinned along the bottom of the screen */
 @media (max-width:600px){
-#hm-root.hm-play .side{position:sticky;bottom:0;z-index:6;max-height:62vh;
+#hm-root.hm-play .side{position:sticky;bottom:0;z-index:6;max-height:62vh;padding-bottom:calc(8px + var(--sab,0px));
   border-top:1px solid var(--ink-4);box-shadow:0 -10px 24px rgba(0,0,0,.45);border-radius:0 0 var(--r) var(--r)}
 }
 /* on its side: the game on the left, the controls in a column on the right
@@ -1404,6 +1425,52 @@
 #hm-root.hm-play .bigcard{grid-row:1/4;width:78px;height:110px;font-size:22px;padding:8px 9px}
 #hm-root.hm-play .bigcard .su{font-size:26px}
 }
+/* ---------- the installed app draws under the phone's clock, battery and home bar ---------- */
+#hm-root .hm-safetop{position:fixed;left:0;right:0;top:0;height:var(--sat,0px);background:var(--ink);z-index:70;pointer-events:none}
+#hm-root .shell{padding-top:calc(14px + var(--sat,0px));padding-left:calc(var(--pad) + var(--sal,0px));padding-right:calc(var(--pad) + var(--sar,0px));padding-bottom:calc(92px + var(--sab,0px))}
+#hm-root .tick-bar{padding-bottom:calc(8px + var(--sab,0px));padding-left:calc(var(--pad) + var(--sal,0px));padding-right:calc(var(--pad) + var(--sar,0px))}
+#hm-root .toast{top:calc(16px + var(--sat,0px))}
+#hm-root #hm-lamp{bottom:calc(52px + var(--sab,0px));right:calc(9px + var(--sar,0px))}
+/* ---------- the header on a phone: two rows, so nothing runs off the edge ----------
+   Brand, news, profile and sound on top; the balance, the jackpot and the way
+   back to the field underneath. In a game (.hm-play) it packs into one row. */
+@media (max-width:600px){
+#hm-root .top{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto auto;
+  grid-template-areas:"brand brand news prof snd" "count jack war war war";gap:6px;align-items:center}
+#hm-root .bank{display:contents}
+#hm-root .brand{grid-area:brand;min-width:0}
+#hm-root .counter{grid-area:count;justify-self:start;min-width:0;padding:4px 7px}
+#hm-root .digits span{font-size:15px}
+#hm-root .jack{grid-area:jack;padding:5px 8px}
+#hm-root #hm-toWar{grid-area:war;justify-self:end;padding:0 9px}
+#hm-root #hm-newsBtn{grid-area:news}
+#hm-root #hm-profileBtn{grid-area:prof}
+#hm-root #hm-sound{grid-area:snd}
+#hm-root.hm-play .top{display:flex;align-items:center}
+#hm-root.hm-play .counter{margin-left:auto}
+#hm-root.hm-play #hm-newsBtn{display:none}
+}
+@media (max-width:400px){
+#hm-root .jword{display:none}
+#hm-root .brand p{display:none}
+}
+/* the narrowest phones: the jackpot moves up beside the coin, the balance gets the
+   whole second row next to the way back to the field */
+@media (max-width:360px){
+#hm-root .top{grid-template-areas:"brand jack news prof snd" "count count war war war"}
+#hm-root .brand h1{display:none}
+}
+#hm-root .icon-btn{position:relative}
+#hm-root .ndot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--hot);box-shadow:0 0 0 2px var(--ink-2)}
+#hm-root .ndot.hide{display:none}
+#hm-root .newspanel .rigcard{width:min(460px,100%);max-height:calc(100vh - 32px - var(--sat,0px) - var(--sab,0px));display:flex;flex-direction:column}
+#hm-root .newsbody{overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px}
+#hm-root .newsitem{border:1px solid var(--ink-3);border-radius:10px;padding:10px 12px;background:rgba(0,0,0,.18)}
+#hm-root .newsitem.latest{border-color:var(--brass-dk);background:rgba(242,181,68,.06)}
+#hm-root .newsitem h3{display:flex;align-items:baseline;gap:8px;font-size:13.5px;margin-bottom:5px}
+#hm-root .newsitem h3 span{font-family:var(--f-mono);font-size:10.5px;color:var(--brass);letter-spacing:.04em;white-space:nowrap}
+#hm-root .newsitem ul{padding-left:16px;display:flex;flex-direction:column;gap:3px}
+#hm-root .newsitem li{font-size:12.5px;color:#B8C2DE;line-height:1.45}
 #hm-root .rigpanel{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:16px;background:rgba(4,7,16,.72);backdrop-filter:blur(4px)}
 #hm-root .rigpanel.hide{display:none}
 #hm-root .rigcard{width:min(400px,100%);background:var(--ink-2);border:1px solid var(--ink-4);border-radius:14px;padding:16px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
@@ -1956,13 +2023,14 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
       <div class="pick" id="mnav">
         <button class="btn" id="tutbtn">TUTORIAL</button>
         <button class="btn" id="helpbtn">HOW TO PLAY</button>
+        <button class="btn" id="newsbtn">NEWS<span id="newsdot" class="hide">NEW</span></button>
         <button class="btn" id="profbtn">PROFILE</button>
         <button class="btn" id="machbtn">ACHIEVEMENTS<span id="machn"></span></button>
         <button class="btn" id="garagebtn">GARAGE &amp; UPGRADES</button>
         <button class="btn" id="casinobtn">HOUSE MONEY</button>
       </div>
       <button class="btn" id="go">START</button>
-      <span id="mbuild">build washout-37</span>
+      <span id="mbuild">build washout-38</span>
     </div>
   </div>
 
@@ -1979,6 +2047,12 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
     <button class="btn" id="gback" style="padding:.42em 1.4em;margin-top:.3em">BACK</button>
   </div>
 
+  <div class="sheet hide" id="news">
+    <h2>NEWS</h2>
+    <p style="font-size:.62em;opacity:.7;max-width:34em">What changed in each build, newest first. The build you are running is in the corner of the main menu.</p>
+    <div id="newslist"></div>
+    <button class="btn" id="newsback" style="padding:.42em 1.4em;margin-top:.3em">BACK</button>
+  </div>
   <div class="sheet hide" id="settings">
     <h2>SETTINGS</h2>
     <div class="setrow">
@@ -2091,6 +2165,8 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
 
 
 <div id="hm-root" class="hide" aria-hidden="true">
+<!-- covers the strip under the phone's clock and battery in the installed app -->
+<div class="hm-safetop" aria-hidden="true"></div>
 
 
 <div class="shell">
@@ -2106,8 +2182,9 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
         <div class="digits" id="hm-digits" aria-live="polite" aria-label="Balance"></div>
         <div class="delta" id="hm-delta"></div>
       </div>
-      <div class="jack" id="hm-jack" title="Progressive jackpot — grows with every wager"><span id="hm-jackIc"></span>JACKPOT <b id="hm-jackVal">$0</b></div>
+      <div class="jack" id="hm-jack" title="Progressive jackpot — grows with every wager"><span id="hm-jackIc"></span><span class="jword">JACKPOT</span> <b id="hm-jackVal">$0</b></div>
       <button class="cashier" id="hm-toWar" title="Back to the battlefield"><span id="hm-warIc"></span><span id="hm-warLabel">To the field</span></button>
+      <button class="icon-btn" id="hm-newsBtn" aria-label="News" title="News"><i class="ndot hide"></i></button>
       <button class="icon-btn" id="hm-profileBtn" aria-label="Profile" title="Profile"></button>
       <button class="icon-btn" id="hm-sound" aria-label="Toggle sound"></button>
     </div>
@@ -2477,6 +2554,14 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
 <div class="tick-bar"><div class="tick-in"><b>Feed</b><div class="feed" id="hm-feed"></div></div></div>
 <div id="hm-lamp" aria-hidden="true"></div>
 <div class="toast" id="hm-toast"></div>
+<!-- news: the update notes, read from the tank game's list -->
+<div class="rigpanel newspanel hide" id="hm-newsPanel" role="dialog" aria-modal="true" aria-labelledby="hm-newsTitle">
+  <div class="rigcard">
+    <div class="righead"><h2 id="hm-newsTitle">News</h2><button class="rigx" id="hm-newsClose" aria-label="Close">×</button></div>
+    <p class="rigsub">What changed in each build, newest first.</p>
+    <div class="newsbody" id="hm-newsBody"></div>
+  </div>
+</div>
 <!-- the house rules: five taps on the HOUSE MONEY heading, for phones that have no keyboard to type the codes on -->
 <div class="rigpanel hide" id="hm-rigPanel" role="dialog" aria-modal="true" aria-labelledby="hm-rigTitle">
   <div class="rigcard">
@@ -2544,6 +2629,7 @@ const P = {
   box:'<path d="M3 8.2 12 3.5l9 4.7v7.6L12 20.5 3 15.8z"/><path d="M3 8.2 12 13l9-4.8M12 13v7.5"/><path d="M7.5 5.9 16.5 10.6"/>',
   bacc:'<rect x="3" y="4.5" width="8" height="15" rx="1.8"/><rect x="13" y="4.5" width="8" height="15" rx="1.8"/><path d="M7 9.5v5M4.6 12h4.8"/><path d="M17 9.5 19 12l-2 2.5-2-2.5z"/>',
   hilo:'<path d="M7 10.5 12 5.5l5 5"/><path d="M7 17.5 12 22.5l5-5" opacity=".55"/><path d="M12 5.5v8"/>',
+  news:'<path d="M4 5.5h12v13H6a2 2 0 0 1-2-2z"/><path d="M16 9h3.5v7.5a2 2 0 0 1-2 2H16"/><path d="M7 9h6M7 12h6M7 15h4"/>',
   dollar:'<path d="M12 3v18M16.2 7.2c-.9-1.3-2.4-2-4.2-2-2.5 0-4.2 1.3-4.2 3.3s1.6 2.9 4.2 3.5 4.2 1.5 4.2 3.5-1.7 3.3-4.2 3.3c-1.9 0-3.4-.7-4.3-2.1"/>'
 };
 function ic(n, size, extra){
@@ -3170,6 +3256,38 @@ document.addEventListener('keydown', e=>{
     tone(S.rig?880:220,.09,'square',.05);
   }
 });
+/* News: the update notes live in the tank game (window.TANKDUEL.news), written once */
+function newsList(){ return (window.TANKDUEL&&Array.isArray(window.TANKDUEL.news)) ? window.TANKDUEL.news : []; }
+function paintNewsDot(){
+  const d=HMROOT&&HMROOT.querySelector('#hm-newsBtn .ndot');
+  if(d) d.classList.toggle('hide', !(window.TANKDUEL&&window.TANKDUEL.newsSeen) || window.TANKDUEL.newsSeen());
+}
+function openNewsHM(){
+  const body=$('newsBody'); body.innerHTML='';
+  const list=newsList();
+  if(!list.length){ const p=document.createElement('p'); p.className='rigsub'; p.textContent='No news yet.'; body.appendChild(p); }
+  list.forEach((n,i)=>{
+    const d=document.createElement('div'); d.className='newsitem'+(i===0?' latest':'');
+    const h3=document.createElement('h3');
+    const tag=document.createElement('span'); tag.textContent=n.build==='earlier'?'EARLIER':n.build;
+    h3.append(tag, document.createTextNode(n.title));
+    const ul=document.createElement('ul');
+    (n.notes||[]).forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); });
+    d.append(h3,ul); body.appendChild(d);
+  });
+  $('newsPanel').classList.remove('hide'); body.scrollTop=0;
+  if(window.TANKDUEL&&window.TANKDUEL.seeNews) window.TANKDUEL.seeNews();
+  paintNewsDot(); SFX.tap();
+}
+function closeNewsHM(){ $('newsPanel').classList.add('hide'); }
+(function(){
+  const b=$('newsBtn'); if(!b) return;
+  b.insertAdjacentHTML('afterbegin', ic('news',17));
+  b.onclick=openNewsHM;
+  $('newsClose').onclick=closeNewsHM;
+  $('newsPanel').addEventListener('click',e=>{ if(e.target===$('newsPanel')) closeNewsHM(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('newsPanel').classList.contains('hide')) closeNewsHM(); });
+})();
 /* The same three switches for a phone, which has no keyboard to type them on:
    five quick taps on the HOUSE MONEY heading open the house rules. */
 function syncRig(){
@@ -5497,6 +5615,7 @@ load();
    ========================================================== */
 function syncWallet(){ shown = S.bal; paintBalance(S.bal, true); syncCashier(); }
 function openCasino(){
+  paintNewsDot();
   if(casinoOpen) return;
   casinoOpen = true; entryBal = S.bal;
   HMROOT.classList.remove('hide'); HMROOT.setAttribute('aria-hidden','false');
@@ -19418,7 +19537,7 @@ window.addEventListener('keydown',e=>{
   else if(k==='m'){ if(profOpen) closeProfile(); else openProfile(phase==='menu'?'menu':'game'); }
   else if(k==='p'){ if(!profOpen&&!helpOpen&&!tut.pause) setPaused(!paused); }
   else if(k==='h'){ helpOpen?closeHelp():openHelp(phase==='menu'?'menu':'game'); }
-  else if(k==='escape'){ if(setOpen) closeSettings(); else if(helpOpen) closeHelp(); else if(profOpen) closeProfile(); else if(paused) setPaused(false); }
+  else if(k==='escape'){ if(newsOpen) closeNews(); else if(setOpen) closeSettings(); else if(helpOpen) closeHelp(); else if(profOpen) closeProfile(); else if(paused) setPaused(false); }
 });
 window.addEventListener('keyup',e=>{
   if(houseUp()) return;
@@ -19517,7 +19636,7 @@ function buildProfile(){
       '<span class="ad">'+(ac.h?ac.h:(ac.hd&&!has?'':ac.d))+'</span>'+bar+'</span>';
     a.appendChild(d);
   }
-  $('achcount').textContent='\u00b7 '+got+' of '+listed+(waiting?'  \u00b7  '+waiting+' to claim':'')+'  \u00b7  build washout-37';
+  $('achcount').textContent='\u00b7 '+got+' of '+listed+(waiting?'  \u00b7  '+waiting+' to claim':'')+'  \u00b7  build washout-38';
   /* one listener on the grid does every CLAIM button in it */
   if(!a.dataset.claimWired){
     a.dataset.claimWired='1';
@@ -20986,6 +21105,68 @@ function closeHelp(){
   helpOpen=false; $('help').classList.add('hide');
   if(helpFrom==='menu') $('menu').classList.remove('hide');
 }
+/* ---- news: the update notes, newest first ----
+   Add an entry at the top with every build. House Money reads the same list
+   through TANKDUEL.news, so it is written once. */
+const NEWS=[
+  {build:'washout-38', title:'House Money fits every phone',
+   notes:['The House Money header now uses two rows on a phone: balance, jackpot and To the field always fit on screen.',
+          'House Money and the battlefield stay clear of the phone\'s clock, battery, notch and home bar.',
+          'News: this page. It is on the main menu and in the House Money header.']},
+  {build:'washout-37', title:'Phone mode',
+   notes:['Settings (⚙ in the game, ⚙ Settings on the menu): Phone mode and Sound.',
+          'Phone mode plays sideways even with the phone held upright. Aim by dragging the battlefield; the aim stick that sat over FIRE is gone.',
+          'Bigger flare and FIRE. Cancel, sound, trophies, settings, help and menu sit beside the wind box.',
+          'Hold FIRE and swipe up to cancel the shot.',
+          'House Money on a phone: the bet controls stay on screen while you watch the result, upright or sideways.',
+          'House Money cheats on a phone: tap the HOUSE MONEY heading five times.']},
+  {build:'washout-36', title:'House Money polish · the app',
+   notes:['Plinko: a real ball that bounces off the pegs, lit pegs, coloured buckets and a payout pop-up.',
+          'Crash: a rocket with exhaust, a starfield, an explosion when it snaps, and a gold marker where you cashed out.',
+          'Balloon: a proper balloon that sways, bursts into shreds, or floats away with confetti when you bank it.',
+          'Tank Duel can be installed on a phone as an app that works offline.']},
+  {build:'washout-35', title:'Railgun · nukes',
+   notes:['The Viper\'s railgun pierces everything: every tank on the line, walls, crates and shelters. Magnets and Second Wind no longer bend it.',
+          'Nuclear explosions redrawn: a blinding flash, a shock dome, a fireball cooling into a rolling mushroom cloud, and debris.']},
+  {build:'earlier', title:'Builds 31–34',
+   notes:['Marshal: a rear battery of micro-missiles, and the Air Wing — an F-35 run, with a B-2 and a nuke at level 7.',
+          'All-In (Washout) and its Payback volley. Since build 34, firing Payback ends the turn.',
+          'Inferno heals in fire and flame pillars; Isotope heals in fallout.',
+          'Scrapshot compressors squeeze whatever they land on.']}
+];
+const NEWS_KEY='tankduel.newsSeen';
+function newsSeen(){ try{ return localStorage.getItem(NEWS_KEY)===NEWS[0].build; }catch(e){ return true; } }
+function seeNews(){ try{ localStorage.setItem(NEWS_KEY,NEWS[0].build); }catch(e){} syncNewsDot(); }
+function syncNewsDot(){ const d=$('newsdot'); if(d) d.classList.toggle('hide',newsSeen()); }
+function renderNews(){
+  const el=$('newslist'); if(!el) return;
+  el.innerHTML='';
+  NEWS.forEach((n,i)=>{
+    const d=document.createElement('div');
+    d.className='newsitem'+(i===0?' latest':'');
+    const head=document.createElement('div'); head.className='newshead';
+    const tag=document.createElement('span'); tag.className='newstag'; tag.textContent=n.build==='earlier'?'EARLIER':n.build.toUpperCase();
+    const ttl=document.createElement('b'); ttl.textContent=n.title;
+    head.append(tag,ttl);
+    const ul=document.createElement('ul');
+    for(const t of n.notes){ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li); }
+    d.append(head,ul);
+    el.appendChild(d);
+  });
+}
+let newsOpen=false;
+function openNews(){
+  newsOpen=true; renderNews(); seeNews();
+  $('menu').classList.add('hide');
+  $('news').classList.remove('hide'); $('news').scrollTop=0;
+}
+function closeNews(){
+  newsOpen=false; $('news').classList.add('hide');
+  $('menu').classList.remove('hide');
+}
+window.TANKDUEL = Object.assign(window.TANKDUEL||{}, {
+  news:NEWS, newsSeen:()=>newsSeen(), seeNews:()=>seeNews()
+});
 let setOpen=false, setFrom='menu';
 function openSettings(from){
   setFrom=from; setOpen=true;
@@ -21192,6 +21373,9 @@ $('soundbtn').addEventListener('click',()=>{ toggleMute(); syncSettings(); });
 $('setbtn').addEventListener('click',()=>openSettings(phase==='menu'?'menu':'game'));
 $('setbtn2').addEventListener('click',()=>openSettings('menu'));
 $('setback').addEventListener('click',closeSettings);
+$('newsbtn').addEventListener('click',openNews);
+$('newsback').addEventListener('click',closeNews);
+syncNewsDot();
 $('blitzbtn').addEventListener('click',()=>{ blitz=!blitz; buildRacks(); });
 $('duobtn').addEventListener('click',()=>{ duo=!duo; buildRacks(); });
 $('matebtn').addEventListener('click',()=>{ mateHuman=!mateHuman; buildRacks(); });
