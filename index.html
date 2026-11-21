@@ -176,12 +176,18 @@
     box-shadow:0 6px 20px rgba(0,0,0,.35)}
   #mdrivein{font-size:.4em;letter-spacing:.18em;opacity:.5;user-select:none}
   #mdrive.on{border-color:rgba(255,184,77,.75);background:linear-gradient(180deg,rgba(46,32,20,.7),rgba(20,12,8,.8))}
-  /* Phone mode: finger-sized buttons in the bottom-right corner — FIRE, the
-     flare, cancel and the side column. The barrel nudges keep their size. */
-  body.mob #cancel, body.mob #flare{font-size:1.6em}
+  /* Phone mode keeps only the flare, FIRE and its meter in the bottom-right
+     corner, finger-sized. Cancel and the side column move up either side of the
+     wind box (placeHudButtons), and the barrel nudges go — aim is a drag. */
+  body.mob #flare{font-size:1.6em}
   body.mob #fire{font-size:1.5em;position:relative}
-  body.mob #util{bottom:6.6em;gap:.5em}
-  body.mob #util .btn{font-size:2em}
+  body.mob #util, body.mob #up, body.mob #down{display:none}
+  #windrow{display:flex;align-items:center;gap:.45em;flex:0 0 auto}
+  .wside{display:none;gap:.4em}
+  body.mob .wside{display:flex}
+  .wside .btn{width:3.3em;height:3.3em;font-size:1em;background:rgba(20,16,32,.7)}
+  .wside .btn svg{width:1.4em;height:1.4em;fill:none;stroke:currentColor;stroke-width:2.2;
+                  stroke-linecap:round;stroke-linejoin:round}
   /* the drive strip floats over the left of the bottom bar; keep that much of
      the bar empty, or the strip lies over the first weapon and eats its taps */
   body.mob #bottom > .grp:first-child{min-width:calc(26% - .4em)}
@@ -1676,6 +1682,8 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
         <div class="bar"><i class="ghost" id="g1"></i><i id="b1"></i></div>
         <div class="perk" id="pk1"></div>
       </div>
+      <div id="windrow">
+      <div class="wside" id="wsideL"></div>
       <div id="windbox">
         <div id="windlbl">WIND</div>
         <div id="windarrow"></div>
@@ -1683,6 +1691,8 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
         <div id="turnlbl">Your turn</div>
         <div id="wavelbl" class="hide"></div>
         <div id="weatherlbl" class="hide"></div>
+      </div>
+      <div class="wside" id="wsideR"></div>
       </div>
       <div id="mate">
         <div class="mnm" id="matenm">TEAMMATE</div>
@@ -21614,8 +21624,21 @@ function localPt(e,el){
   return {x:w/2+(e.clientY-cy), y:h/2-(e.clientX-cx), w, h};
 }
 
+/* phone mode lifts cancel and the side column up beside the wind box, three
+   a side; turning it off puts every one back where it came from */
+const PHONE_TOP=[['wsideL',['cancel','mute','achbtn']],['wsideR',['setbtn','helpbtn2','menubtn']]];
+function placeHudButtons(phone){
+  if(phone){
+    for(const [box,ids] of PHONE_TOP){ const b=$(box); if(b) ids.forEach(id=>{ const e=$(id); if(e) b.appendChild(e); }); }
+    return;
+  }
+  const util=$('util'), flare=$('flare');
+  if(util) ['mute','achbtn','setbtn','helpbtn2','menubtn'].forEach(id=>{ const e=$(id); if(e) util.appendChild(e); });
+  const c=$('cancel'); if(c&&flare) flare.parentNode.insertBefore(c,flare);
+}
 function setMobile(on){
   mobile=!!on;
+  placeHudButtons(mobile);
   const m=$('mobile');
   if(m) m.classList.toggle('hide',!mobile||phase==='menu'||phase==='over');
   const b=$('mobilebtn');
