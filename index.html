@@ -1320,6 +1320,90 @@
 @keyframes blip{0%,100%{opacity:1}50%{opacity:.45}}
 #hm-root .foot{font-size:11px;color:var(--muted);text-align:center;line-height:1.6}
 #hm-root .foot b{color:#9AA6CC;font-weight:600}
+/* ---------- phone play: compact, with the controls always in reach ----------
+   On a phone the game sat on top and the bet controls started below it, so
+   every round was a scroll down to press and a scroll back up to see. While a
+   game is open (.hm-play) the chrome gets out of the way and the controls stay
+   on screen: pinned under the game when the phone is upright, in a column
+   beside it when the phone is on its side. */
+/* both ways round: slim chrome, packed controls, smaller boards */
+@media (max-width:600px),(max-height:500px){
+#hm-root.hm-play .shell{padding:6px 8px 8px;gap:6px}
+#hm-root.hm-play .tick-bar,#hm-root.hm-play .foot{display:none}
+#hm-root.hm-play .top{gap:6px}
+#hm-root.hm-play .brand{gap:6px}
+#hm-root.hm-play .brand p,#hm-root.hm-play .jack,#hm-root.hm-play #hm-profileBtn,#hm-root.hm-play #hm-warLabel{display:none}
+#hm-root.hm-play .brand h1{font-size:12px}
+#hm-root.hm-play .digits span{font-size:14px}
+#hm-root.hm-play .icon-btn{width:30px;height:30px}
+#hm-root.hm-play .stage{overflow:visible}
+#hm-root.hm-play .stage-head{padding:5px 8px;gap:8px}
+#hm-root.hm-play .back{padding:5px 9px;display:inline-flex;align-items:center;gap:3px}
+#hm-root.hm-play .stage-head .edge{display:none}
+#hm-root.hm-play .arena{padding:8px;min-height:0}
+#hm-root.hm-play .side{padding:8px;gap:6px;overflow-y:auto;background:rgba(10,15,31,.97);backdrop-filter:blur(8px)}
+#hm-root.hm-play .betbar{gap:6px}
+#hm-root.hm-play .field{gap:2px}
+#hm-root.hm-play .field label{font-size:8.5px;letter-spacing:.12em}
+/* the stake and its quick amounts share one row */
+#hm-root.hm-play .betbar>.field{flex-direction:row;align-items:center;gap:6px}
+#hm-root.hm-play .betbar>.field>label{display:none}
+#hm-root.hm-play .stakebox{flex:1.25;min-width:0}
+#hm-root.hm-play .stakebox input{width:auto;padding:7px 4px}
+#hm-root.hm-play .stakebox .q{padding:7px 6px}
+#hm-root.hm-play .presets{flex:1;margin-top:0;gap:3px}
+#hm-root.hm-play .presets button{padding:7px 0}
+/* a game's own settings side by side, then its buttons across the full width */
+#hm-root.hm-play .act.on{flex:1 1 100%;width:100%;flex-direction:row;flex-wrap:wrap;align-items:flex-end;gap:6px}
+#hm-root.hm-play .act.on>.field{flex:1 1 30%;min-width:110px}
+#hm-root.hm-play .act.on>.go,#hm-root.hm-play .act.on>.row2{flex:1 1 100%}
+#hm-root.hm-play .act.on>.go.sm,#hm-root.hm-play .act.on[data-a="roulette"]>.go{flex:1 1 40%}
+#hm-root.hm-play .go{padding:10px 12px;min-width:0}
+#hm-root.hm-play select,#hm-root.hm-play .numin{padding-top:6px;padding-bottom:6px}
+#hm-root.hm-play .sidepick button{padding:7px}
+#hm-root.hm-play #hm-autoToggle{padding:5px 10px;font-size:11px}
+#hm-root.hm-play .grid5{max-width:280px;gap:5px}
+#hm-root.hm-play .ladder{margin-top:7px}
+#hm-root.hm-play .roubox{gap:7px}
+#hm-root.hm-play .wheelwrap{width:150px;height:150px}
+#hm-root.hm-play .rouResult{font-size:17px;padding:2px 14px}
+#hm-root.hm-play .bcell{padding:5px 1px;font-size:10.5px}
+}
+/* upright: the controls pinned along the bottom of the screen */
+@media (max-width:600px){
+#hm-root.hm-play .side{position:sticky;bottom:0;z-index:6;max-height:62vh;
+  border-top:1px solid var(--ink-4);box-shadow:0 -10px 24px rgba(0,0,0,.45);border-radius:0 0 var(--r) var(--r)}
+}
+/* on its side: the game on the left, the controls in a column on the right
+   that stays put while the game scrolls, the way FIRE sits in the tank game */
+@media (max-height:500px) and (min-width:601px){
+#hm-root.hm-play .stagebody{grid-template-columns:minmax(0,1fr) 238px}
+#hm-root.hm-play .arena{order:1}
+#hm-root.hm-play .side{order:2;position:sticky;top:0;align-self:start;max-height:100vh;
+  border-top:none;border-left:1px solid var(--ink-3)}
+#hm-root.hm-play .crash-wrap{min-height:150px}
+#hm-root.hm-play .ladder{display:none}
+#hm-root.hm-play .grid5{max-width:min(280px,calc(100vh - 130px))}
+#hm-root.hm-play .roubox{flex-direction:row;align-items:center}
+#hm-root.hm-play .wheelcol{width:auto}
+#hm-root.hm-play .wheelwrap{width:118px;height:118px}
+/* the column is narrow: the quick amounts get their own row under the stake */
+#hm-root.hm-play .betbar>.field{flex-direction:column;align-items:stretch;gap:4px}
+/* the tall games, packed to the short screen so the result and its buttons show */
+#hm-root.hm-play .stats3{gap:6px}
+#hm-root.hm-play .tower{gap:3px}
+#hm-root.hm-play .ttile{height:23px}
+#hm-root.hm-play .balloonbox{padding-top:6px}
+#hm-root.hm-play .balloon{width:84px;height:102px}
+#hm-root.hm-play .coinbox{gap:6px}
+#hm-root.hm-play .arena{padding:6px 8px}
+#hm-root.hm-play .bigcoin{width:104px;height:104px}
+/* Hi-Lo: the card on the left, the multiplier and Higher / Lower beside it */
+#hm-root.hm-play .hilobox{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto 1fr;
+  column-gap:14px;row-gap:6px;align-items:center;justify-items:center}
+#hm-root.hm-play .bigcard{grid-row:1/4;width:78px;height:110px;font-size:22px;padding:8px 9px}
+#hm-root.hm-play .bigcard .su{font-size:26px}
+}
 #hm-root .rigpanel{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:16px;background:rgba(4,7,16,.72);backdrop-filter:blur(4px)}
 #hm-root .rigpanel.hide{display:none}
 #hm-root .rigcard{width:min(400px,100%);background:var(--ink-2);border:1px solid var(--ink-4);border-radius:14px;padding:16px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
@@ -2778,6 +2862,8 @@ function toast(m){
    ========================================================== */
 function showView(v){
   S.view = v;
+  /* a phone packs a game tight and pins its controls; see .hm-play */
+  if(HMROOT) HMROOT.classList.toggle('hm-play', v==='stage');
   $('lobby').classList.toggle('hide', v!=='lobby');
   $('profile').classList.toggle('hide', v!=='profile');
   $('stage').classList.toggle('hide', v!=='stage');
@@ -3564,10 +3650,25 @@ let pegLit={}, pParts=[], pFloats=[];
 
 /* ONE source of truth for the board layout. The falling ball and the drawn board
    both read from this — if they disagree the ball sails straight past the slots. */
+/* the tallest the board may be: 430, or on a packed phone screen whatever is
+   left between the top of the game and the pinned controls */
+let pCap=430;
+function plinkoCap(){
+  try{
+    if(!HMROOT.classList.contains('hm-play')) return 430;
+    const upright=window.innerWidth<=600, onSide=!upright&&window.innerHeight<=500;
+    if(!upright&&!onSide) return 430;
+    const side=$('side'), arena=pCv.closest('.arena');
+    if(!side||!arena) return 430;
+    const top=arena.getBoundingClientRect().top+HMROOT.scrollTop+8;
+    /* upright the controls are under the board; on its side they are beside it */
+    return clamp(window.innerHeight-top-(upright?side.offsetHeight:0)-10, upright?250:200, 430);
+  }catch(e){ return 430; }
+}
 function geo(rows){
   const g  = Math.min(pW/(rows+2), 52);
   const bh = Math.min(g*0.82, 34);           /* visible slot height */
-  const rh = Math.min(g*0.86, 30, (430-bh-34)/(rows+1.4));
+  const rh = Math.min(g*0.86, 30, (pCap-bh-34)/(rows+1.4));
   const ty = rh*1.5+8;                       /* room for the chute over the top peg */
   const by = ty + rows*rh + 8;               /* top of the slot row */
   return { g, rh, ty, bh, by, h: by+bh+16, pr: Math.max(2.2, Math.min(g*.08, rh*.16)) };
@@ -3578,6 +3679,7 @@ const ballR  = rows => { const G=geo(rows); return clamp(Math.min(G.g*0.22, G.rh
 
 function sizePlinko(){
   ROWS=rowsPick();
+  pCap=plinkoCap();
   if(press.length!==ROWS+1) press=new Array(ROWS+1).fill(0);
   pW=pCv.parentElement.clientWidth||600;
   pH=geo(ROWS).h;
