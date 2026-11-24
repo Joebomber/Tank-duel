@@ -216,6 +216,40 @@
   .newshead b{font-size:.78em}
   .newsitem ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:.2em}
   .newsitem li{font-size:.6em;line-height:1.45;opacity:.82}
+  /* ---- the garage in phone mode -----------------------------------------
+     The stage's text is scaled to its width, which is about 9px on a phone,
+     and the garage was drawn for 16. Its upgrade buttons came out 12px wide
+     with 5px writing, and a tap that missed one landed on the background and
+     put the card away, so after the first upgrade it seemed nothing more
+     would buy. Here the garage gets the size it was designed at, and the
+     held-up card is flat, finger-sized and scrolls within the screen. The
+     !important on its transform outranks the 3D fly-in and knock animations
+     (their colour glows still run). */
+  body.mob #garage{font-size:16px}
+  body.mob #grack.focused .tcard.on{transform:translate(-50%,-50%) !important;
+    font-size:1.3em;width:min(31em,94%);max-height:calc(100% - 1.4em);overflow-y:auto;overscroll-behavior:contain;
+    /* two columns, so the whole card fits a phone held sideways without
+       scrolling: the hull and what it is on the left, the buttons on the right */
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);column-gap:.7em;row-gap:.1em;align-content:start;
+    grid-template-areas:"show chips" "sw chips" "tn chips" "st perk" "ab perkall" "sig perkall"}
+  body.mob #grack.focused .tcard.on>.tshow{grid-area:show;max-height:4.4em;align-self:center;justify-self:center}
+  body.mob #grack.focused .tcard.on>.swatch{grid-area:sw;margin:0}
+  body.mob #grack.focused .tcard.on>.tn{grid-area:tn}
+  body.mob #grack.focused .tcard.on>.st{grid-area:st}
+  body.mob #grack.focused .tcard.on>.ab{grid-area:ab}
+  body.mob #grack.focused .tcard.on>.sw{grid-area:sig}
+  body.mob #grack.focused .tcard.on>.chips{grid-area:chips;margin-top:0}
+  body.mob #grack.focused .tcard.on>.upbtn[data-buy="perk"]:not(.bulk){grid-area:perk;margin-top:.3em !important}
+  body.mob #grack.focused .tcard.on>.upbtn.bulk{grid-area:perkall;margin-top:.3em}
+  body.mob #grack.focused .tcard.on .chips{flex-wrap:wrap;gap:.3em}
+  body.mob #grack.focused .tcard.on .chips .upbtn{flex:1 1 58%;flex-direction:row;justify-content:space-between;
+    align-items:center;gap:.5em;min-height:3.4em;padding:.5em .7em;font-size:.56em}
+  body.mob #grack.focused .tcard.on .chips .upbtn.bulk{flex:1 1 30%;justify-content:center}
+  body.mob #grack.focused .tcard.on>.upbtn{min-height:3.4em;padding:.5em .7em;font-size:.56em;flex-direction:row;justify-content:space-between}
+  body.mob #garage .uprow{padding:.4em .5em}
+  body.mob #garage .uprow .upbtn{font-size:.66em;min-height:3.2em;min-width:8em;padding:.4em .6em}
+  body.mob #garage .uprow .upbtn.bulk{min-width:5.4em}
+  body.mob #garage .vfxrow .upbtn{font-size:.66em;min-height:3.2em;padding:.4em .7em}
   /* ---- settings ---- */
   .setrow{display:flex;align-items:center;gap:1em;width:min(34em,92%);text-align:left;
     background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:.8em;padding:.6em .8em}
@@ -2082,7 +2116,7 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
         <button class="btn" id="casinobtn">HOUSE MONEY</button>
       </div>
       <button class="btn" id="go">START</button>
-      <span id="mbuild">build washout-40</span>
+      <span id="mbuild">build washout-41</span>
     </div>
   </div>
 
@@ -14788,6 +14822,11 @@ function clearWave(){
 
 /* ============================== update ============================== */
 function update(dt){
+  /* a lazy flush: progress is written a beat after it changes, so a long
+     match is not doing a JSON round-trip on every hit. It comes first: it
+     used to sit after the menu's early return, so a garage purchase was only
+     written when the app went into the background (build 41). */
+  if(saveDirty){ saveT+=dt; if(saveT>1.2){ saveT=0; saveProfile(); } }
   if(helpOpen||tut.pause||profOpen||paused) return;
   if(phase==='menu'||phase==='over'){
     if(introOpen&&phase==='menu'){ stepTitle(dt); return; }
@@ -14800,9 +14839,6 @@ function update(dt){
   }
   const me=tanks[turn], human=isHuman();
   hold=Math.max(0,hold-dt); tNow+=dt;
-  /* a lazy flush: progress is written a beat after it changes, so a long
-     match is not doing a JSON round-trip on every hit */
-  if(saveDirty){ saveT+=dt; if(saveT>1.2){ saveT=0; saveProfile(); } }
 
   if(waveBreak>0){
     waveBreak-=dt;
@@ -19826,7 +19862,7 @@ function buildProfile(){
       '<span class="ad">'+(ac.h?ac.h:(ac.hd&&!has?'':ac.d))+'</span>'+bar+'</span>';
     a.appendChild(d);
   }
-  $('achcount').textContent='\u00b7 '+got+' of '+listed+(waiting?'  \u00b7  '+waiting+' to claim':'')+'  \u00b7  build washout-40';
+  $('achcount').textContent='\u00b7 '+got+' of '+listed+(waiting?'  \u00b7  '+waiting+' to claim':'')+'  \u00b7  build washout-41';
   /* one listener on the grid does every CLAIM button in it */
   if(!a.dataset.claimWired){
     a.dataset.claimWired='1';
@@ -21160,7 +21196,9 @@ function boltOff(card){
 }
 function spend(n){
   if(profile.coins<n){ sfxTick(180,.12); toast('Not enough scrap'); return false; }
-  profile.coins-=n; bump('spent',n); sfxTick(1000,.16); checkAch(); return true;
+  /* marked for saving here, not just through bump(): bump skips the mark in
+     a demo or Blitz, and a purchase must never be lost (build 41) */
+  profile.coins-=n; markSave(); bump('spent',n); sfxTick(1000,.16); checkAch(); return true;
 }
 /* Clicking off the held-up card puts it away. Done on the sheet rather
    than on a pane over the top, so a press aimed at a button can never be
@@ -21299,6 +21337,10 @@ function closeHelp(){
    Add an entry at the top with every build. House Money reads the same list
    through TANKDUEL.news, so it is written once. */
 const NEWS=[
+  {build:'washout-41', title:'The garage on a phone',
+   notes:['In Phone mode the garage is drawn at full size: readable writing, and upgrade buttons big enough for a finger (they were about 12 pixels wide with 5-pixel writing).',
+          'The held-up tank card lays out in two columns, so every upgrade and the Ability button fit on the screen without scrolling inside the card.',
+          'Fixed: purchases made in the garage were only saved when the app went into the background, and in Blitz mode not at all. They are now saved within a second or two.']},
   {build:'washout-40', title:'Sideways is your choice · All-In on a phone',
    notes:['Settings → Sideways: in Phone mode, choose whether the game always plays sideways, or follows how you hold the phone.',
           'All-In\'s Second Wind has a button now: the pill above the weapons counts down the free turns, then switches between turning shells away and pulling them in. Before, only the G key could do it.',
