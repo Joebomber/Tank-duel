@@ -250,6 +250,9 @@
   body.mob #garage .uprow .upbtn{font-size:.66em;min-height:3.2em;min-width:8em;padding:.4em .6em}
   body.mob #garage .uprow .upbtn.bulk{min-width:5.4em}
   body.mob #garage .vfxrow .upbtn{font-size:.66em;min-height:3.2em;padding:.4em .7em}
+  #garage>.coins{position:sticky;top:-.5em;z-index:7;padding:.25em .9em;border-radius:2em;
+    background:rgba(20,16,32,.94);border:1px solid rgba(255,209,102,.45);box-shadow:0 .3em .8em rgba(0,0,0,.45)}
+  .upbtn.poor{opacity:.5;filter:saturate(.35)}
   /* ---- settings ---- */
   .setrow{display:flex;align-items:center;gap:1em;width:min(34em,92%);text-align:left;
     background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:.8em;padding:.6em .8em}
@@ -535,9 +538,15 @@
   #tutdots b.on{background:#ffd166}
   #power.chilled i{background:linear-gradient(90deg,#8fd8ff,#d8f3ff)!important}
   #power.chilled{box-shadow:0 0 0 1px rgba(143,216,255,.6) inset}
-  #toast{position:absolute;left:50%;top:28%;transform:translateX(-50%);
+  /* above every sheet and the held-up card: it lives in the HUD, which is drawn
+     under the menus, so "Not enough scrap" used to appear behind the garage
+     and a tap there seemed to do nothing (build 42) */
+  #toast{position:absolute;left:50%;top:28%;transform:translateX(-50%);z-index:90;pointer-events:none;
          font-family:'Bungee',sans-serif;font-size:1.2em;letter-spacing:.04em;opacity:0;
          text-shadow:0 3px 0 rgba(0,0,0,.55);transition:opacity .25s;white-space:nowrap;text-align:center}
+  /* over a menu it sits on a pill, so it reads against the buttons under it */
+  #toast.boxed{padding:.45em 1.1em;border-radius:2em;background:rgba(14,10,24,.96);
+         border:1px solid rgba(255,209,102,.55);box-shadow:0 .4em 1.2em rgba(0,0,0,.6);color:#ffd166}
 
   /* ---- the garage display -----------------------------------------------
      A camera on the garage rack only. Widening the base .tcard hit the menu
@@ -2116,7 +2125,7 @@ body.in-casino #stage{visibility:hidden;pointer-events:none}
         <button class="btn" id="casinobtn">HOUSE MONEY</button>
       </div>
       <button class="btn" id="go">START</button>
-      <span id="mbuild">build washout-41</span>
+      <span id="mbuild">build washout-42</span>
     </div>
   </div>
 
@@ -19441,6 +19450,7 @@ function selectWep(i){
 function toast(msg){
   if(!msg) return;
   const el=$('toast'); el.textContent=msg; el.style.opacity=1; toastT=1.6;
+  el.classList.toggle('boxed', !!document.querySelector('#stage>.sheet:not(.hide)'));
 }
 function buildFoes(){
   const box=$('foes'); box.innerHTML='';
@@ -19787,10 +19797,11 @@ function buildVfx(){
     const d=document.createElement('div');
     d.className='vfxrow'+(on?' on':'');
     d.innerHTML='<span class="vn">'+f.n+'</span><span class="vd">'+f.d+'</span>'+
-      '<button class="btn upbtn'+(on?' max':'')+'" data-buy="vfx" data-id="'+f.id+'">'+
+      '<button class="btn upbtn'+(on?' max':'')+'" data-buy="vfx" data-id="'+f.id+'"'+(owned?'':' data-cost="'+f.c+'"')+'>'+
       (owned?(on?'EQUIPPED':'EQUIP'):('BUY · '+f.c+' ◈'))+'</button>';
     el.appendChild(d);
   }
+  markAfford();
 }
 function titleName(){
   const t=TITLES.find(x=>x.id===profile.title);
@@ -19862,7 +19873,7 @@ function buildProfile(){
       '<span class="ad">'+(ac.h?ac.h:(ac.hd&&!has?'':ac.d))+'</span>'+bar+'</span>';
     a.appendChild(d);
   }
-  $('achcount').textContent='\u00b7 '+got+' of '+listed+(waiting?'  \u00b7  '+waiting+' to claim':'')+'  \u00b7  build washout-41';
+  $('achcount').textContent='\u00b7 '+got+' of '+listed+(waiting?'  \u00b7  '+waiting+' to claim':'')+'  \u00b7  build washout-42';
   /* one listener on the grid does every CLAIM button in it */
   if(!a.dataset.claimWired){
     a.dataset.claimWired='1';
@@ -19905,9 +19916,16 @@ function buildCodex(){
     el.appendChild(d);
   }
 }
+/* dim whatever the scrap in hand will not stretch to, so a tap that cannot
+   buy is not a surprise */
+function markAfford(){
+  for(const b of document.querySelectorAll('#garage [data-cost]'))
+    b.classList.toggle('poor', profile.coins < +b.dataset.cost);
+}
 function refreshCoins(){
   const c=Math.floor(profile.coins);
   $('coin1').textContent=c; $('coin2').textContent=c;
+  markAfford();
   if(window.CASINO) CASINO.sync();
 }
 function perkTextFor(c,lv){
@@ -20159,12 +20177,12 @@ function fillCard(d,c,ci,owned){
   let chips='';
   if(owned) for(const tr of TRACKS){
     const lv=u[tr.k], max=lv>=MAXLV;
-    chips+='<button class="btn upbtn'+(max?' max':'')+'" data-buy="tank" data-id="'+c.id+'" data-k="'+tr.k+'" title="'+tr.d+'">'+
+    chips+='<button class="btn upbtn'+(max?' max':'')+'" data-buy="tank" data-id="'+c.id+'" data-k="'+tr.k+'"'+(max?'':' data-cost="'+tCost(c.id,tr.k)+'"')+' title="'+tr.d+'">'+
       '<span>'+tr.n+'</span>'+pips(lv)+'<span>'+(max?'MAX':'\u25b2 '+tCost(c.id,tr.k))+'</span></button>'+
       (max?'':bulkBtn('tank',c.id,tr.k,trackPlan(c.id,tr.k)));
   }
   const pl=u.perk||0, pmax=pl>=PERKMAX;
-  const abil=owned?('<button class="btn upbtn'+(pmax?' max':'')+'" data-buy="perk" data-id="'+c.id+'"'+
+  const abil=owned?('<button class="btn upbtn'+(pmax?' max':'')+'" data-buy="perk" data-id="'+c.id+'"'+(pmax?'':' data-cost="'+perkCost(c.id)+'"')+
     ' style="width:100%;margin-top:.26em" title="'+c.perk+'">'+
     '<span>ABILITY '+pl+'/'+PERKMAX+'</span>'+
     '<span>'+(pmax?'MAX':perkCost(c.id)+' \u25c8')+'</span></button>'+
@@ -20172,7 +20190,7 @@ function fillCard(d,c,ci,owned){
   const up=gFocused&&gView===ci;
   d.innerHTML=(up?hullShowcase(c):'')+cardHTML(c,'')+
     (owned?'<div class="chips">'+chips+'</div>'+abil
-          :'<button class="btn upbtn" data-buy="unlock" data-id="'+c.id+'" style="width:100%;margin-top:.3em">BUY \u00b7 '+c.price+' \u25c8</button>');
+          :'<button class="btn upbtn" data-buy="unlock" data-id="'+c.id+'" data-cost="'+c.price+'" style="width:100%;margin-top:.3em">BUY \u00b7 '+c.price+' \u25c8</button>');
   fitChase(d,c.id,up);
   if(up) startShowcase(d,c);
 }
@@ -20259,6 +20277,7 @@ function buildGarage(){
   });
   buildWepList();
   refreshCoins();
+  markAfford();
 }
 /* The weapon rack for whichever hull is picked. Split out so buying one
    upgrade can redraw it without rebuilding every card in the garage. */
@@ -20284,12 +20303,13 @@ function buildWepList(){
     row.innerHTML='<svg viewBox="0 0 24 24">'+ICON[id]+'</svg>'+
       '<span class="un">'+w.name+'</span>'+pips(lv,Object.keys(PERK[id]||{}).map(Number),mx)+
       '<span class="ud"><b class="wdesc">'+(DESC[id]||'')+'</b>'+bonus+' · '+nxt+'</span>'+
-      '<button class="btn upbtn'+(max?' max':'')+'" data-buy="wep" data-id="'+id+'">'+
+      '<button class="btn upbtn'+(max?' max':'')+'" data-buy="wep" data-id="'+id+'"'+(max?'':' data-cost="'+wCost(cls.id,id)+'"')+'>'+
       (max?'MAX':'UPGRADE · '+wCost(cls.id,id)+' ◈')+'</button>'+
       (max?'':bulkBtn('wep',id,null,wepPlan(cls.id,id)));
     wl.appendChild(row);
   }
   refreshCoins();
+  markAfford();
 }
 /* How many steps the scrap in hand covers, and the total. Each step is
    priced off the level before it, so this has to walk them rather than
@@ -21195,7 +21215,7 @@ function boltOff(card){
   setTimeout(()=>b.remove(),700);
 }
 function spend(n){
-  if(profile.coins<n){ sfxTick(180,.12); toast('Not enough scrap'); return false; }
+  if(profile.coins<n){ sfxTick(180,.12); toast('NOT ENOUGH SCRAP — NEED '+Math.ceil(n-profile.coins)+' MORE'); return false; }
   /* marked for saving here, not just through bump(): bump skips the mark in
      a demo or Blitz, and a purchase must never be lost (build 41) */
   profile.coins-=n; markSave(); bump('spent',n); sfxTick(1000,.16); checkAch(); return true;
@@ -21337,6 +21357,10 @@ function closeHelp(){
    Add an entry at the top with every build. House Money reads the same list
    through TANKDUEL.news, so it is written once. */
 const NEWS=[
+  {build:'washout-42', title:'You can see what you can afford',
+   notes:['Fixed: tapping an upgrade or a victory effect you could not afford seemed to do nothing. The "Not enough scrap" message was drawn behind the garage. It now shows on top and says how much more you need.',
+          'Upgrades and victory effects you cannot afford yet are dimmed, and they light up again as soon as you have the scrap.',
+          'Your scrap total stays pinned at the top of the garage while you scroll, so you can always see what you have to spend.']},
   {build:'washout-41', title:'The garage on a phone',
    notes:['In Phone mode the garage is drawn at full size: readable writing, and upgrade buttons big enough for a finger (they were about 12 pixels wide with 5-pixel writing).',
           'The held-up tank card lays out in two columns, so every upgrade and the Ability button fit on the screen without scrolling inside the card.',
